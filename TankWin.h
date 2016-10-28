@@ -22,7 +22,6 @@ protected:
 	//{{AFX_MSG(TankWin)
 	afx_msg void TankWin::OnDestroy() ;
 	afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
-	afx_msg void TankWin::OnTimer(UINT nIDEvent); 
 	afx_msg int TankWin::OnCreate(LPCREATESTRUCT lpCreateStruct) ;
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
@@ -53,6 +52,8 @@ private:
 	std::wstring pathname;
 	std::vector<std::shared_ptr<IDirectDrawSurface>> surfaces;
 	std::map<int, std::wstring> fileNameMapping;
+	int lastProjectileXPos = 0;
+	int lastProjectileYPos = 0;
 
 	void RestoreSurfaces();
 	LPDIRECTDRAWSURFACE createCustomSurface(const std::wstring& fileName);

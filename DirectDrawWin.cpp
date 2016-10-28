@@ -242,7 +242,7 @@ BOOL DirectDrawWin::ClearSurface( LPDIRECTDRAWSURFACE surf, DWORD clr, RECT* rec
 		desc.dwFlags=DDSD_WIDTH | DDSD_HEIGHT;
 		if (surf->GetSurfaceDesc( &desc )!=DD_OK)
 			return FALSE;
-		int w=desc.dwWidth;
+		
 		int h=desc.dwHeight;
 
 		r=surf->Lock( 0, &desc, DDLOCK_WAIT  | DDLOCK_WRITEONLY, 0 );
@@ -334,8 +334,8 @@ BOOL DirectDrawWin::Copy_Bmp24_Surface16( LPDIRECTDRAWSURFACE surf,
 	DDSURFACEDESC desc;
 	ZeroMemory( &desc, sizeof(desc) );
 	desc.dwSize = sizeof(desc);
-	HRESULT r=surf->Lock( 0, &desc, DDLOCK_WAIT | DDLOCK_WRITEONLY, 0 );
-	if (r!=DD_OK)
+	HRESULT hr=surf->Lock( 0, &desc, DDLOCK_WAIT | DDLOCK_WRITEONLY, 0 );
+	if (hr!=DD_OK)
 	{
 		TRACE("Copy_Bmp24_Surface16: Lock() failed\n");
 		return FALSE;
@@ -384,8 +384,8 @@ BOOL DirectDrawWin::Copy_Bmp24_Surface24( LPDIRECTDRAWSURFACE surf,
 	DDSURFACEDESC desc;
 	ZeroMemory( &desc, sizeof(desc) );
 	desc.dwSize = sizeof(desc);
-	HRESULT r=surf->Lock( 0, &desc, DDLOCK_WAIT | DDLOCK_WRITEONLY, 0 );
-	if (r!=DD_OK)
+	HRESULT hr=surf->Lock( 0, &desc, DDLOCK_WAIT | DDLOCK_WRITEONLY, 0 );
+	if (hr!=DD_OK)
 	{
 		TRACE("Copy_Bmp24_Surface24: Lock() failed\n");
 		return FALSE;
@@ -412,16 +412,16 @@ BOOL DirectDrawWin::Copy_Bmp24_Surface24( LPDIRECTDRAWSURFACE surf,
 		TRACE("not using optimated code...\n");
 		for(int i=0; i<h; i++ )
 		{
-			RGBTRIPLE* surf=(RGBTRIPLE*)surfbits;
+			RGBTRIPLE* surf1=(RGBTRIPLE*)surfbits;
 			RGBTRIPLE* image=(RGBTRIPLE*)imagebits;
 			for (int p=0;p<w;p++)
 			{
 				DWORD r=image->rgbtRed   << loREDbit;
 				DWORD g=image->rgbtGreen << loGREENbit;
 				DWORD b=image->rgbtBlue  << loBLUEbit;
-				DWORD* data=(DWORD*)surf;
+				DWORD* data=(DWORD*)surf1;
 				*data = r|g|b; 
-				surf++;
+				surf1++;
 				image++;
 			}
 			surfbits += desc.lPitch;
@@ -442,8 +442,8 @@ BOOL DirectDrawWin::Copy_Bmp24_Surface32( LPDIRECTDRAWSURFACE surf,
 	DDSURFACEDESC desc;
 	ZeroMemory( &desc, sizeof(desc) );
 	desc.dwSize = sizeof(desc);
-	HRESULT r=surf->Lock( 0, &desc, DDLOCK_WAIT | DDLOCK_WRITEONLY, 0 );
-	if (r!=DD_OK)
+	HRESULT hr=surf->Lock( 0, &desc, DDLOCK_WAIT | DDLOCK_WRITEONLY, 0 );
+	if (hr!=DD_OK)
 	{
 		TRACE("Copy_Bmp24_Surface32: Lock() failed\n");
 		return FALSE;
@@ -455,16 +455,16 @@ BOOL DirectDrawWin::Copy_Bmp24_Surface32( LPDIRECTDRAWSURFACE surf,
 
 	for(int i=0; i<h; i++ )
 	{
-		DWORD* surf=(DWORD*)surfbits;
+		DWORD* surf1=(DWORD*)surfbits;
 		RGBTRIPLE* image=(RGBTRIPLE*)imagebits;
 		for (int p=0;p<w;p++)
 		{
 			DWORD r=image->rgbtRed   << loREDbit;
 			DWORD g=image->rgbtGreen << loGREENbit;
 			DWORD b=image->rgbtBlue  << loBLUEbit;
-			DWORD* data=(DWORD*)surf;
+			DWORD* data=(DWORD*)surf1;
 			*data = r|g|b; 
-			surf++;
+			surf1++;
 			image++;
 		}
 		surfbits += desc.lPitch;
@@ -512,7 +512,7 @@ BOOL DirectDrawWin::Create(const CString& title,int icon)
 	sClassName = AfxRegisterWndClass(CS_HREDRAW | CS_VREDRAW,LoadCursor(0, IDC_ARROW),
 			(HBRUSH)(COLOR_WINDOW + 1), LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(icon)));
 
-	return CWnd::CreateEx( WS_EX_APPWINDOW, sClassName, title, WS_THICKFRAME, 0,0,640,480, 0, 0 );
+	return CWnd::CreateEx( WS_EX_APPWINDOW, sClassName, title, WS_THICKFRAME | WS_MAXIMIZE | WS_MINIMIZE | WS_OVERLAPPEDWINDOW, 0,0,640,480, 0, 0 );
 }
 
 BOOL DirectDrawWin::CreateFlippingSurfaces()
@@ -1269,11 +1269,11 @@ BOOL DirectDrawWin::SaveSurface(LPDIRECTDRAWSURFACE surf, LPCTSTR filename)
 	else
 		infohdr.biClrUsed = 0;
 
-	LPDIRECTDRAWPALETTE palette;
+	LPDIRECTDRAWPALETTE tempPalette;
 	if (depth==8)
 	{
-		primsurf->GetPalette( &palette );
-		palette->GetEntries( 0, 0, 256, pe );
+		primsurf->GetPalette( &tempPalette);
+		tempPalette->GetEntries( 0, 0, 256, pe );
 		for (int i=0;i<256;i++)
 		{
 			quads[i].rgbRed   = pe[i].peRed;
@@ -1345,9 +1345,8 @@ BOOL DirectDrawWin::SaveSurface16(LPDIRECTDRAWSURFACE surf, FILE* fp, DWORD w, D
 	DDSURFACEDESC desc;
 	ZeroMemory( &desc, sizeof(desc) );
 	desc.dwSize=sizeof(desc);
-	HRESULT r;
-	r=surf->Lock( 0, &desc, DDLOCK_WAIT | DDLOCK_READONLY, 0 );
-	if (r!=DD_OK)
+	HRESULT hr=surf->Lock( 0, &desc, DDLOCK_WAIT | DDLOCK_READONLY, 0 );
+	if (hr!=DD_OK)
 	{
 		TRACE("SaveSurface(): Lock() failed\n");
 		return FALSE;
@@ -1400,9 +1399,8 @@ BOOL DirectDrawWin::SaveSurface24(LPDIRECTDRAWSURFACE surf, FILE* fp, DWORD w, D
 	DDSURFACEDESC desc;
 	ZeroMemory( &desc, sizeof(desc) );
 	desc.dwSize=sizeof(desc);
-	HRESULT r;
-	r=surf->Lock( 0, &desc, DDLOCK_WAIT | DDLOCK_READONLY, 0 );
-	if (r!=DD_OK)
+	HRESULT hr=surf->Lock( 0, &desc, DDLOCK_WAIT | DDLOCK_READONLY, 0 );
+	if (hr!=DD_OK)
 	{
 		TRACE("SaveSurface(): Lock() failed\n");
 		return FALSE;
@@ -1451,9 +1449,9 @@ BOOL DirectDrawWin::SaveSurface32(LPDIRECTDRAWSURFACE surf, FILE* fp, DWORD w, D
 	DDSURFACEDESC desc;
 	ZeroMemory( &desc, sizeof(desc) );
 	desc.dwSize=sizeof(desc);
-	HRESULT r;
-	r=surf->Lock( 0, &desc, DDLOCK_WAIT | DDLOCK_READONLY, 0 );
-	if (r!=DD_OK)
+	HRESULT hr;
+	hr=surf->Lock( 0, &desc, DDLOCK_WAIT | DDLOCK_READONLY, 0 );
+	if (hr!=DD_OK)
 	{
 		TRACE("SaveSurface(): Lock() failed\n");
 		return FALSE;

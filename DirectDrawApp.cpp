@@ -38,17 +38,17 @@ BOOL DirectDrawApp::OnIdle(LONG)
 	timer1++;
 	timer++;
 
-	if(timer==201)
-	{
-		bOgon=false;
-		timer=1;
-	}
-	if(timer==120 && bOgon==true)
+	if(timer == 1200 && bOgon && !bVzr)
 	{	
 		bOgon=false;
 		bVzr=true;
-		timer=0;
-	
+	}
+
+	if (bVzr && timer > 2300)
+	{
+		bVzr = false;
+		bOgon = false;
+		timer = 0;
 	}
 	if(timer1==60)
 	{

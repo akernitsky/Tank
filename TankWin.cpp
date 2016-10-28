@@ -39,17 +39,12 @@ TankWin::TankWin()
 {
 	right=FALSE;	
 	k=500;
-//	int iInstallResult;
-//	iInstallResult=SetTimer(1,10,NULL);
-//	if (iInstallResult==0)
-//	{
-//		MessageBox("cannot install timer!");
-//	}
 
-	t = 0;
-	w = 0;
-	y = 1;
-	hh = 1;
+
+	t = 100;
+	w = 100;
+	y = 5;
+	hh = 5;
 	bOgon = false;
 }
 
@@ -77,7 +72,6 @@ void TankWin::addToSurfaces(IDirectDrawSurface* surface)
 		
 		surfaces.push_back(std::shared_ptr<IDirectDrawSurface>(surface, std::mem_fn(&IUnknown::Release)));
 	}
-	
 }
 
 void TankWin::createSurfaces()
@@ -224,14 +218,14 @@ std::pair<int, int> TankWin::calculateCanonsTip(int turretPosition)
 
 	const double angle = (turretPosition - 1) * 2 * M_PI / 16 - M_PI / 2;
 
-	return std::make_pair(static_cast<int>(xCenter + std::cos(angle) * width), static_cast<int>(yCenter + std::sin(angle) * height));
+	return std::make_pair(static_cast<int>(xCenter + std::cos(angle) * width / 2), static_cast<int>(yCenter + std::sin(angle) * height / 2));
 }
 
 static std::pair<int, int> calculateProjectileDistanceInCoordinates(int turretPosition, int time)
 {
 	const double angle = (turretPosition - 1) * 2 * M_PI / 16 - M_PI / 2;
-	auto xExtent = std::cos(angle) * time / 10;
-	auto yExtent = std::sin(angle) * time / 10;
+	auto xExtent = std::cos(angle) * time / 2;
+	auto yExtent = std::sin(angle) * time / 2;
 
 	const int height = 54;
 	const int width = 74;
@@ -245,24 +239,14 @@ static std::pair<int, int> calculateProjectileDistanceInCoordinates(int turretPo
 
 void TankWin::drawProjectileInPosition(int xPos, int yPos)
 {
-	BltSurface(backsurf, getProjectileSurface(), xPos, yPos, FALSE);
-
-//	if (timer <= 10)
-//	{
-//		xx1 = 105 + t;
-//		yy1 = 76 + w;
-//		ww1 = y;
-//	}
-//	if (bPul)
-//	{
-//	BltSurface(backsurf, getProjectileSurfaceEraser(), xPos - 37, yy1 - 27 - timer1 * 12, FALSE)
+	BltSurface(backsurf, getProjectileSurface(), xPos - 37, yPos, FALSE);
 }
 
 void TankWin::drawExplosion(int xPos, int yPos)
 {
-	if (bVzr && timer <= 124)
+	if (bVzr && timer < 2280)
 	{
-		BltSurface(backsurf, surfaces[73 + timer / 4].get(), xPos, yPos, TRUE);
+		BltSurface(backsurf, surfaces[73 + (timer - 1200) / 40].get(), xPos, yPos, TRUE);
 	}
 }
 
@@ -277,14 +261,16 @@ void TankWin::drawProjectile()
 			ww = hh;
 		}
 		const auto canonsTip = calculateCanonsTip(ww);
-		const auto extent = calculateProjectileDistanceInCoordinates(ww, timer * 10);
+		const auto extent = calculateProjectileDistanceInCoordinates(ww, timer / 3);
 
 		const int projectileXPos = canonsTip.first + extent.first;
 		const int projectileYPos = canonsTip.second + extent.second;
 		drawProjectileInPosition(projectileXPos, projectileYPos);
 
-	//	drawExplosion(projectileXPos, projectileYPos);
+		lastProjectileXPos = projectileXPos;
+		lastProjectileYPos = projectileYPos;
 	}
+	drawExplosion(lastProjectileXPos - 37, lastProjectileYPos - 37);
 }
 
 void TankWin::DrawScene()
@@ -344,21 +330,21 @@ int TankWin::SelectInitialDisplayMode()
 {
 	DWORD curdepth=GetDisplayDepth();
 	int i, nummodes=GetNumDisplayModes();
-	DWORD w,h,d;
+	DWORD wd,h,d;
 
 	if (curdepth!=desireddepth)
 		ddraw2->SetDisplayMode( 2880, 1800, curdepth, 0, 0 );
 
 	for (i=0;i<nummodes;i++)
 	{
-		GetDisplayModeDimensions( i, w, h, d );
+		GetDisplayModeDimensions( i, wd, h, d );
 		if (w==desiredwidth && h==desiredheight && d==desireddepth)
 			return i;
 	}
 
 	for (i=0;i<nummodes;i++)
 	{
-		GetDisplayModeDimensions( i, w, h, d );
+		GetDisplayModeDimensions( i, wd, h, d );
 		if (d==desireddepth)
 			return i;
 	}
@@ -374,18 +360,18 @@ void TankWin::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 		bPul=true;
 	}
 
-	if(nChar==VK_RETURN && bOgon==false)
+	if(nChar == VK_RETURN && bOgon == false)
 	{
-		timer=1;
-		bOgon=true;
+		timer = 1;
+		bOgon = true;
 	}
 	
-	if (nChar==VK_ESCAPE)
+	if (nChar == VK_ESCAPE)
 	{
 		PostMessage( WM_CLOSE );
 	}
 	
-	if (nChar==VK_SPACE)
+	if (nChar == VK_SPACE)
 	{
 		y++;
 		hh++;
@@ -518,18 +504,3 @@ void TankWin::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 	}
 	DirectDrawWin::OnKeyDown(nChar, nRepCnt, nFlags);
 }
-
-void TankWin::OnTimer(UINT nIDEvent) 
-{
-//	if(nIDEvent==1)
-//	{	
-//		MessageBox("asd");
-//	}
-//	if (right)
-//	{
-//		if(nIDEvent==1)
-//		t++;
-//	}
-//TankWin::OnTimer(nIDEvent);
-}
-
