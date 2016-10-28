@@ -11,8 +11,8 @@ public:
 	int k;
 	BOOL right;
 	int w;
-	int t;
 	int y;
+	int t;
 	int hh;
 	int ww;
 	int ww1;
@@ -38,12 +38,24 @@ private:
 	void DrawScene();
 	void addToSurfaces(IDirectDrawSurface* surface);
 	void createSurfaces();
+	IDirectDrawSurface* getTerrainSurface();
+	IDirectDrawSurface* getProjectileSurface();
+	void drawSurface();
+	void drawTank();
+	void drawTankHull();
+	void drawTankTurret();
+	std::pair<int, int> calculateCanonsTip(int turretPosition);
+	void drawProjectileInPosition(int xx, int yy);
+	void drawProjectile();
+	void drawExplosion(int xPos, int yPos);
+	IDirectDrawSurface* getProjectileSurfaceEraser();
 
-	std::string pathname;
-	LPDIRECTDRAWSURFACE surf11;
+	std::wstring pathname;
+	std::vector<std::shared_ptr<IDirectDrawSurface>> surfaces;
+	std::map<int, std::wstring> fileNameMapping;
 
 	void RestoreSurfaces();
-	LPDIRECTDRAWSURFACE createCustomSurface(const std::string& fileName);
+	LPDIRECTDRAWSURFACE createCustomSurface(const std::wstring& fileName);
 };
 
 

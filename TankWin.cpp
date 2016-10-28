@@ -46,77 +46,20 @@ TankWin::TankWin()
 //		MessageBox("cannot install timer!");
 //	}
 
-	surf1 = 0;
-	y = 5;
 	t = 0;
 	w = 0;
-	hh = 5;
+	y = 1;
+	hh = 1;
 	bOgon = false;
-	surf2 = 0;
-	surf3 = 0;
-	surf4=0;
-	surf5=0;
-	surf6=0;
-	surf7=0;
-	surf8=0;
-	surf9=0;
-	surf10=0;
-	surf11=0;
-	surf12=0;
-	surf13=0;
-	surf14=0;
-	surf15=0;
-	surf16=0;
-	surf17 = 0;
-	surf18 = 0;
-	surf19 = 0;
-	surf20 = 0;
-	surf21 = 0;
-	surf22 = 0;
-	surf23 = 0;
-	surf24 = 0;
-	surf25 = 0;
-	surf26 = 0;
-	surf27 = 0;
-	surf28 = 0;
-	surf29 = 0;
-	surf30 = 0;
-	surf31 = 0;
-	surf32 = 0;
-	surf33 = 0;
-	surf34 = 0;
-	surf35 = 0;
-	surf36 = 0;
-	surf37 = 0;
-	tsurf1=0;
-	tsurf2=0;
-	tsurf3=0;
-	tsurf4=0;
-	tsurf5=0;
-	tsurf6=0;
-	tsurf7=0;
-	tsurf8=0;
-	tsurf9=0;
-	tsurf10=0;
-	tsurf11=0;
-	tsurf12=0;
-	tsurf13=0;
-	tsurf14=0;
-	tsurf15=0;
-	tsurf16=0;
-
-	for (int i = 0; i < 32; ++i)
-		surf[i] = nullptr;
-
 }
 
-LPDIRECTDRAWSURFACE TankWin::createCustomSurface(const std::string& fileName)
+LPDIRECTDRAWSURFACE TankWin::createCustomSurface(const std::wstring& fileName)
 {
 	LPDIRECTDRAWSURFACE surf = CreateSurface(fileName);
 	
 	if(surf == 0)
 	{
-		const std::string errorText = std::string("failed to load: " + fileName);
+		const std::wstring errorText = std::wstring(L"failed to load: " + fileName);
 		Fatal(errorText.c_str());
 	}
 	return surf;
@@ -124,15 +67,101 @@ LPDIRECTDRAWSURFACE TankWin::createCustomSurface(const std::string& fileName)
 void TankWin::addToSurfaces(IDirectDrawSurface* surface)
 {
 	assert(surface != nullptr);
+	
 	if (surface != nullptr)
-	{
+	{	
+		DDCOLORKEY colorkey;
+		colorkey.dwColorSpaceLowValue = 0;
+		colorkey.dwColorSpaceHighValue = 0;
+		surface->SetColorKey(DDCKEY_SRCBLT, &colorkey);
+		
 		surfaces.push_back(std::shared_ptr<IDirectDrawSurface>(surface, std::mem_fn(&IUnknown::Release)));
 	}
+	
 }
 
 void TankWin::createSurfaces()
 {
-	std::map<int, std::string> fileNameMapping = { std::make_pair(0, "tankback.bmp") };
+	fileNameMapping = { 
+		std::make_pair(0, L"tankback.bmp"),
+		std::make_pair(1, L"tankright1.bmp"),
+		std::make_pair(2, L"tankrightback.bmp"),
+		std::make_pair(3, L"tankright2.bmp"),
+		std::make_pair(4, L"tankright3.bmp"),
+		std::make_pair(5, L"tankright4.bmp"),
+		std::make_pair(6, L"tankright6.bmp"),
+		std::make_pair(7, L"tankright7.bmp"),
+		std::make_pair(8, L"tankfront.bmp"),
+		std::make_pair(9, L"tankleft4.bmp"),
+		std::make_pair(10, L"tankleftfront.bmp"),
+		std::make_pair(11, L"tankleft3.bmp"),
+		std::make_pair(12, L"tankleft.bmp"),
+		std::make_pair(13, L"tankleft23.bmp"),
+		std::make_pair(14, L"tankleftback.bmp"),
+		std::make_pair(15, L"tankleft1.bmp"),
+		std::make_pair(16, L"1.bmp"),
+		std::make_pair(17, L"2.bmp"),
+		std::make_pair(18, L"3.bmp"),
+		std::make_pair(19, L"4.bmp"),
+		std::make_pair(20, L"5.bmp"),
+		std::make_pair(21, L"6.bmp"),
+		std::make_pair(22, L"7.bmp"),
+		std::make_pair(23, L"8.bmp"),
+		std::make_pair(24, L"9.bmp"),
+		std::make_pair(25, L"10.bmp"),
+		std::make_pair(26, L"11.bmp"),
+		std::make_pair(27, L"12.bmp"),
+		std::make_pair(28, L"13.bmp"),
+		std::make_pair(29, L"14.bmp"),
+		std::make_pair(30, L"15.bmp"),
+		std::make_pair(31, L"16.bmp"),
+		std::make_pair(32, L"ter.bmp"),
+		std::make_pair(33, L"trackh.bmp"),
+		std::make_pair(34, L"trackv.bmp"),
+		std::make_pair(35, L"point.bmp"),
+		std::make_pair(36, L"er.bmp"),
+		std::make_pair(37, L"tankback.bmp"),
+		std::make_pair(38, L"tankright1.bmp"),
+		std::make_pair(39, L"tankrightback.bmp"),
+		std::make_pair(40, L"tankright2.bmp"),
+		std::make_pair(41, L"tankright3.bmp"),
+		std::make_pair(42, L"tankright4.bmp"),
+		std::make_pair(43, L"tankright6.bmp"),
+		std::make_pair(44, L"tankright7.bmp"),
+		std::make_pair(45, L"tankfront.bmp"),
+		std::make_pair(46, L"tankleft4.bmp"),
+		std::make_pair(47, L"tankleftfront.bmp"),
+		std::make_pair(48, L"tankleft3.bmp"),
+		std::make_pair(49, L"tankleft.bmp"),
+		std::make_pair(50, L"tankleft23.bmp"),
+		std::make_pair(51, L"tankleftback.bmp"),
+		std::make_pair(52, L"tankleft1.bmp"),
+		std::make_pair(53, L"1.bmp"),
+		std::make_pair(54, L"2.bmp"),
+		std::make_pair(55, L"3.BMP"),
+		std::make_pair(56, L"4.BMP"),
+		std::make_pair(57, L"5.BMP"),
+		std::make_pair(58, L"6.BMP"),
+		std::make_pair(59, L"7.BMP"),
+		std::make_pair(60, L"8.BMP"),
+		std::make_pair(61, L"9.BMP"),
+		std::make_pair(62, L"10.BMP"),
+		std::make_pair(63, L"11.BMP"),
+		std::make_pair(64, L"12.BMP"),
+		std::make_pair(65, L"13.BMP"),
+		std::make_pair(66, L"14.BMP"),
+		std::make_pair(67, L"15.BMP"),
+		std::make_pair(68, L"16.BMP"),
+		std::make_pair(69, L"ter.BMP"),
+		std::make_pair(70, L"trackh.BMP"),
+		std::make_pair(71, L"trackv.BMP"),
+		std::make_pair(72, L"point.BMP") 
+	};
+
+	for (int i = 101; i <= 132; ++i)
+	{
+		fileNameMapping.insert(fileNameMapping.end(), std::make_pair(i - 101 + 73, std::to_wstring(i) + L".bmp"));
+	}
 
 	for (const auto& element : fileNameMapping)
 	{
@@ -145,561 +174,117 @@ BOOL TankWin::CreateCustomSurfaces()
 {
 	createSurfaces();
 
-	std::string fileName ="tankright1.bmp";
-	if (surf2)
-	surf2->Release(),surf2=0;
-	surf2=CreateSurface(fileName);
-	if (surf2==0)
-	{
-	Fatal("failed to load BMP2");
-	return FALSE;
-	}
-	fileName="tankrightback.bmp";
-	if (surf3)
-	surf3->Release(),surf3=0;
-	surf3=CreateSurface(fileName);
-	if (surf3==0)
-	{
-	Fatal("failed to load BMP3");
-	return FALSE;
-	}
-	fileName="tankright2.bmp";//
-	if (surf4)
-	surf4->Release(),surf4=0;
-	surf4=CreateSurface(fileName);
-	if (surf4==0)
-	{
-	Fatal("failed to load BMP4");
-	return FALSE;
-	}
-	fileName="tankright3.bmp";//
-	if (surf5)
-	surf5->Release(),surf5=0;
-	surf5=CreateSurface(fileName);
-	if (surf5==0)
-	{
-	Fatal("failed to load BMP5");
-	return FALSE;
-	}
-	fileName="tankright4.bmp";//
-	if (surf6)
-	surf6->Release(),surf6=0;
-	surf6=CreateSurface(fileName);
-	if (surf6==0)
-	{
-	Fatal("failed to load BMP6");
-	return FALSE;
-	}
-	fileName="tankright6.bmp";//
-	if (surf7)
-	surf7->Release(),surf7=0;
-	surf7=CreateSurface(fileName);
-	if (surf7==0)
-	{
-	Fatal("failed to load BMP7");
-	return FALSE;
-	}
-	fileName="tankright7.bmp";//
-	if (surf8)
-	surf8->Release(),surf8=0;
-	surf8=CreateSurface(fileName);
-	if (surf8==0)
-	{
-	Fatal("failed to load BMP8");
-	return FALSE;
-	}
-	fileName="tankfront.bmp";//
-	if (surf9)
-	surf9->Release(),surf9=0;
-	surf9=CreateSurface(fileName);
-	if (surf9==0)
-	{
-	Fatal("failed to load BMP9");
-	return FALSE;
-	}
-	fileName="tankleft4.bmp";
-	if (surf10)
-	surf10->Release(),surf10=0;
-	surf10=CreateSurface(fileName);
-	if (surf10==0)
-	{
-	Fatal("failed to load BMP10");
-	return FALSE;
-	}
-	fileName="tankleftfront.bmp";
-	if (surf11)
-	surf11->Release(),surf11=0;
-	surf11=CreateSurface(fileName);
-	if (surf11==0)
-	{
-	Fatal("failed to load BMP11");
-	return FALSE;
-	}
-	fileName="tankleft3.bmp";
-	if (surf12)
-	surf12->Release(),surf12=0;
-	surf12=CreateSurface(fileName);
-	if (surf12==0)
-	{
-	Fatal("failed to load BMP12");
-	return FALSE;
-	}
-	fileName="tankleft.bmp";
-	if (surf13)
-	surf13->Release(),surf13=0;
-	surf13=CreateSurface(fileName);
-	if (surf13==0)
-	{
-	Fatal("failed to load BMP13");
-	return FALSE;
-	}
-	fileName="tankleft23.bmp";
-	if (surf14)
-	surf14->Release(),surf14=0;
-	surf14=CreateSurface(fileName);
-	if (surf14==0)
-	{
-	Fatal("failed to load BMP14");
-	return FALSE;
-	}
-	fileName="tankleftback.bmp";
-	if (surf15)
-	surf15->Release(),surf15=0;
-	surf15=CreateSurface(fileName);
-	if (surf15==0)
-	{
-	Fatal("failed to load BMP15");
-	return FALSE;
-	}
-	
-	fileName="tankleft1.bmp";
-	if (surf16)
-	surf16->Release(),surf16=0;
-	surf16=CreateSurface(fileName);
-	if (surf16==0)
-	{
-	Fatal("failed to load BMP16");
-	return FALSE;
-	}
-
-
-	
-	fileName="1.bmp";
-	if (surf17)
-	surf17->Release(),surf17=0;
-	surf17=CreateSurface(fileName,TRUE);
-	if (surf17==0)
-	{
-		Fatal("failed to load BMP17");
-		return FALSE;
-	}
-
-	
-	fileName="2.bmp";
-	if (surf18)
-	surf18->Release(),surf18=0;
-	surf18=CreateSurface(fileName,TRUE);
-		
-	if (surf18==0)
-	{
-		Fatal("failed to load BMP18");
-		return FALSE;
-	}
-
-		fileName="3.bmp";
-	if (surf19)
-	surf19->Release(),surf19=0;
-	surf19=CreateSurface(fileName,TRUE);
-	
-	
-	if (surf19==0)
-	{
-		Fatal("failed to load BMP19");
-		return FALSE;
-	}
-		fileName="4.bmp";
-	if (surf20)
-	surf20->Release(),surf20=0;
-	surf20=CreateSurface(fileName,TRUE);
-	
-	
-	if (surf20==0)
-	{
-		Fatal("failed to load BMP20");
-		return FALSE;
-	}
-		fileName="5.bmp";
-	if (surf21)
-	surf21->Release(),surf21=0;
-	surf21=CreateSurface(fileName,TRUE);
-	
-	
-	if (surf21==0)
-	{
-		Fatal("failed to load BMP21");
-		return FALSE;
-	}
-		fileName="6.bmp";
-	if (surf22)
-	surf22->Release(),surf22=0;
-	surf22=CreateSurface(fileName,TRUE);
-	
-	
-	if (surf22==0)
-	{
-		Fatal("failed to load BMP22");
-		return FALSE;
-	}
-		fileName="7.bmp";
-	if (surf23)
-	surf23->Release(),surf23=0;
-	surf23=CreateSurface(fileName,TRUE);
-	
-	
-	if (surf23==0)
-	{
-		Fatal("failed to load BMP23");
-		return FALSE;
-	}
-		fileName="8.bmp";
-	if (surf24)
-	surf24->Release(),surf24=0;
-	surf24=CreateSurface(fileName,TRUE);
-	
-	
-	if (surf24==0)
-	{
-		Fatal("failed to load BMP24");
-		return FALSE;
-	}
-		fileName="9.bmp";
-	if (surf25)
-	surf25->Release(),surf25=0;
-	surf25=CreateSurface(fileName,TRUE);
-	
-	
-	if (surf25==0)
-	{
-		Fatal("failed to load BMP25");
-		return FALSE;
-	}
-		fileName="10.bmp";
-	if (surf26)
-	surf26->Release(),surf26=0;
-	surf26=CreateSurface(fileName,TRUE);
-	
-	
-	if (surf26==0)
-	{
-		Fatal("failed to load BMP26");
-		return FALSE;
-	}
-		fileName="11.bmp";
-	if (surf27)
-	surf27->Release(),surf27=0;
-	surf27=CreateSurface(fileName,TRUE);
-	
-	
-	if (surf27==0)
-	{
-		Fatal("failed to load BMP27");
-		return FALSE;
-	}
-		fileName="12.bmp";
-	if (surf28)
-	surf28->Release(),surf28=0;
-	surf28=CreateSurface(fileName,TRUE);
-	
-	
-	if (surf28==0)
-	{
-		Fatal("failed to load BMP28");
-		return FALSE;
-	}
-			fileName="13.bmp";
-	if (surf29)
-	surf29->Release(),surf29=0;
-	surf29=CreateSurface(fileName,TRUE);
-	
-	
-	if (surf29==0)
-	{
-		Fatal("failed to load BMP29");
-		return FALSE;
-	}	
-	fileName="14.bmp";
-	if (surf30)
-	surf30->Release(),surf30=0;
-	surf30=CreateSurface(fileName,TRUE);
-	
-	
-	if (surf30==0)
-	{
-		Fatal("failed to load BMP30");
-		return FALSE;
-	}
-
-	fileName="15.bmp";
-	if (surf31)
-		surf31->Release(),surf31=0;
-		surf31=CreateSurface(fileName,TRUE);
-		
-	if (surf31==0)
-	{
-		Fatal("failed to load BMP31");
-		return FALSE;
-	}
-
-	fileName="16.bmp";
-	if (surf32)
-	surf32->Release(),surf32=0;
-	surf32=CreateSurface(fileName,TRUE);
-	
-	
-	if (surf32==0)
-	{
-		Fatal("failed to load BMP32");
-		return FALSE;
-	}
-	
-
-	fileName="ter.bmp";
-	if (surf33)
-	surf33->Release(),surf33=0;
-	surf33=CreateSurface(fileName,TRUE);
-	
-	
-	if (surf33==0)
-	{
-		Fatal("failed to load BMP33");
-		return FALSE;
-	}
-
-		fileName="trackh.bmp";
-	if (surf34)
-	surf34->Release(),surf34=0;
-	surf34=CreateSurface(fileName,TRUE);
-	
-	
-	if (surf34==0)
-	{
-		Fatal("failed to load BMP34");
-		return FALSE;
-	}
-	
-
-	fileName="trackv.bmp";
-	if (surf35)
-	surf35->Release(),surf35=0;
-	surf35=CreateSurface(fileName,TRUE);
-	
-	
-	if (surf35==0)
-	{
-		Fatal("failed to load BMP35");
-		return FALSE;
-	}
-
-		fileName="point.bmp";
-	if (surf36)
-	surf36->Release(),surf36=0;
-	surf36=CreateSurface(fileName,TRUE);
-	
-	
-	if (surf36==0)
-	{
-		Fatal("failed to load BMP36");
-		return FALSE;
-	}
-
-		fileName="er.bmp";
-	if (surf37)
-	surf37->Release(),surf37=0;
-	surf37=CreateSurface(fileName,TRUE);
-	
-	
-	if (surf37==0)
-	{
-		Fatal("failed to load BMP37");
-		return FALSE;
-	}
-
-	for(int m=101; m<=132; m++)
-	{
-		std::string filename = std::to_string(m) + ".bmp";
-		
-		if (surf[m-101])
-			surf[m-101]->Release(),surf[m-101]=0;
-			surf[m-101] = CreateSurface(filename, true);
-		
-		
-		if (surf[m-101]== 0)
-		{
-			Fatal("failed to load BMP312");
-			return FALSE;
-		}
-	}
-
-	DDCOLORKEY  colorkey;
-	colorkey.dwColorSpaceLowValue = 0;
-	colorkey.dwColorSpaceHighValue = 0;
-	
-	surfaces.front()->SetColorKey( DDCKEY_SRCBLT, &colorkey );
-	colorkey.dwColorSpaceLowValue = 0;
-	colorkey.dwColorSpaceHighValue = 0;
-	
-	surf2->SetColorKey( DDCKEY_SRCBLT, &colorkey );
-	colorkey.dwColorSpaceLowValue = 0;
-	colorkey.dwColorSpaceHighValue = 0;
-	
-	surf3->SetColorKey( DDCKEY_SRCBLT, &colorkey );
-	colorkey.dwColorSpaceLowValue = 0;
-	colorkey.dwColorSpaceHighValue = 0;
-	
-	surf4->SetColorKey( DDCKEY_SRCBLT, &colorkey );
-	colorkey.dwColorSpaceLowValue = 0;
-	colorkey.dwColorSpaceHighValue = 0;
-	
-	surf5->SetColorKey( DDCKEY_SRCBLT, &colorkey );
-	colorkey.dwColorSpaceLowValue = 0;
-	colorkey.dwColorSpaceHighValue = 0;
-	
-	surf6->SetColorKey( DDCKEY_SRCBLT, &colorkey );
-	colorkey.dwColorSpaceLowValue = 0;
-	colorkey.dwColorSpaceHighValue = 0;
-	
-	surf7->SetColorKey( DDCKEY_SRCBLT, &colorkey );
-	colorkey.dwColorSpaceLowValue = 0;
-	colorkey.dwColorSpaceHighValue = 0;
-	
-	surf8->SetColorKey( DDCKEY_SRCBLT, &colorkey );
-	colorkey.dwColorSpaceLowValue = 0;
-	colorkey.dwColorSpaceHighValue = 0;
-	
-	surf9->SetColorKey( DDCKEY_SRCBLT, &colorkey );
-	colorkey.dwColorSpaceLowValue = 0;
-	colorkey.dwColorSpaceHighValue = 0;
-	
-	surf10->SetColorKey( DDCKEY_SRCBLT, &colorkey );
-	colorkey.dwColorSpaceLowValue = 0;
-	colorkey.dwColorSpaceHighValue = 0;
-	
-	surf11->SetColorKey( DDCKEY_SRCBLT, &colorkey );
-	colorkey.dwColorSpaceLowValue = 0;
-	colorkey.dwColorSpaceHighValue = 0;
-	
-	surf12->SetColorKey( DDCKEY_SRCBLT, &colorkey );
-	colorkey.dwColorSpaceLowValue = 0;
-	colorkey.dwColorSpaceHighValue = 0;
-	
-	surf13->SetColorKey( DDCKEY_SRCBLT, &colorkey );
-	colorkey.dwColorSpaceLowValue = 0;
-	colorkey.dwColorSpaceHighValue = 0;
-	
-	surf14->SetColorKey( DDCKEY_SRCBLT, &colorkey );
-	colorkey.dwColorSpaceLowValue = 0;
-	colorkey.dwColorSpaceHighValue = 0;
-	
-	surf15->SetColorKey( DDCKEY_SRCBLT, &colorkey );
-	colorkey.dwColorSpaceLowValue = 0;
-	colorkey.dwColorSpaceHighValue = 0;
-	
-	surf16->SetColorKey( DDCKEY_SRCBLT, &colorkey );
-	
-
-	surf17->SetColorKey( DDCKEY_SRCBLT, &colorkey );
-	colorkey.dwColorSpaceLowValue = 0;
-	colorkey.dwColorSpaceHighValue = 0;
-	
-	surf18->SetColorKey( DDCKEY_SRCBLT, &colorkey );
-	colorkey.dwColorSpaceLowValue = 0;
-	colorkey.dwColorSpaceHighValue = 0;
-	
-	surf19->SetColorKey( DDCKEY_SRCBLT, &colorkey );
-	colorkey.dwColorSpaceLowValue = 0;
-	colorkey.dwColorSpaceHighValue = 0;
-	
-	surf20->SetColorKey( DDCKEY_SRCBLT, &colorkey );
-	colorkey.dwColorSpaceLowValue = 0;
-	colorkey.dwColorSpaceHighValue = 0;
-	
-	surf21->SetColorKey( DDCKEY_SRCBLT, &colorkey );
-	colorkey.dwColorSpaceLowValue = 0;
-	colorkey.dwColorSpaceHighValue = 0;
-	
-	surf22->SetColorKey( DDCKEY_SRCBLT, &colorkey );
-	colorkey.dwColorSpaceLowValue = 0;
-	colorkey.dwColorSpaceHighValue = 0;
-	
-	surf23->SetColorKey( DDCKEY_SRCBLT, &colorkey );
-	colorkey.dwColorSpaceLowValue = 0;
-	colorkey.dwColorSpaceHighValue = 0;
-	
-	surf24->SetColorKey( DDCKEY_SRCBLT, &colorkey );
-	colorkey.dwColorSpaceLowValue = 0;
-	colorkey.dwColorSpaceHighValue = 0;
-
-	surf25->SetColorKey( DDCKEY_SRCBLT, &colorkey );
-	colorkey.dwColorSpaceLowValue = 0;
-	colorkey.dwColorSpaceHighValue = 0;
-
-	surf26->SetColorKey( DDCKEY_SRCBLT, &colorkey );
-	colorkey.dwColorSpaceLowValue = 0;
-	colorkey.dwColorSpaceHighValue = 0;
-
-	surf27->SetColorKey( DDCKEY_SRCBLT, &colorkey );
-	colorkey.dwColorSpaceLowValue = 0;
-	colorkey.dwColorSpaceHighValue = 0;
-
-	surf28->SetColorKey( DDCKEY_SRCBLT, &colorkey );
-	colorkey.dwColorSpaceLowValue = 0;
-	colorkey.dwColorSpaceHighValue = 0;
-	
-	surf29->SetColorKey( DDCKEY_SRCBLT, &colorkey );
-	colorkey.dwColorSpaceLowValue = 0;
-	colorkey.dwColorSpaceHighValue = 0;
-
-	surf30->SetColorKey( DDCKEY_SRCBLT, &colorkey );
-	colorkey.dwColorSpaceLowValue = 0;
-	colorkey.dwColorSpaceHighValue = 0;
-
-	surf31->SetColorKey( DDCKEY_SRCBLT, &colorkey );
-	colorkey.dwColorSpaceLowValue = 0;
-	colorkey.dwColorSpaceHighValue = 0;
-
-	surf32->SetColorKey( DDCKEY_SRCBLT, &colorkey );
-	colorkey.dwColorSpaceLowValue = 0;
-	colorkey.dwColorSpaceHighValue = 0;
-
-	surf33->SetColorKey( DDCKEY_SRCBLT, &colorkey );	
-	colorkey.dwColorSpaceLowValue = 0;
-	colorkey.dwColorSpaceHighValue = 0;
-	
-	surf34->SetColorKey( DDCKEY_SRCBLT, &colorkey );
-	colorkey.dwColorSpaceLowValue = 0;
-	colorkey.dwColorSpaceHighValue = 0;
-
-	surf35->SetColorKey( DDCKEY_SRCBLT, &colorkey );	
-	colorkey.dwColorSpaceLowValue = 0;
-	colorkey.dwColorSpaceHighValue = 0;
-
-	surf36->SetColorKey( DDCKEY_SRCBLT, &colorkey );	
-	colorkey.dwColorSpaceLowValue = 0;
-	colorkey.dwColorSpaceHighValue = 0;
-
-	surf37->SetColorKey( DDCKEY_SRCBLT, &colorkey );	
-
-
-	for(int n=101; n<=132; n++)
-	{
-		colorkey.dwColorSpaceLowValue = 0;
-		colorkey.dwColorSpaceHighValue = 0;
-		surf[n-101]->SetColorKey( DDCKEY_SRCBLT, &colorkey );	
-	}
-
 	ClearSurface( primsurf, 0 );
 	ClearSurface( backsurf, 0 );
 	return TRUE;
+}
+
+IDirectDrawSurface* TankWin::getTerrainSurface()
+{
+	return surfaces[32].get();
+}
+
+IDirectDrawSurface* TankWin::getProjectileSurface()
+{
+	return surfaces[35].get();
+}
+
+IDirectDrawSurface* TankWin::getProjectileSurfaceEraser()
+{
+	return surfaces[36].get();
+}
+
+void TankWin::drawSurface()
+{
+	BltSurface(backsurf, getTerrainSurface(), 0, 0, TRUE);
+}
+
+void TankWin::drawTank()
+{
+	drawTankHull();
+	drawTankTurret();
+}
+
+void TankWin::drawTankHull()
+{
+	BltSurface(backsurf, surfaces[y - 1].get(), 20 + t, 45 + w, TRUE);
+}
+
+void TankWin::drawTankTurret()
+{
+	BltSurface(backsurf, surfaces[hh + 16 - 1].get(), 20 + t, 42 + w, TRUE);
+}
+
+std::pair<int, int> TankWin::calculateCanonsTip(int turretPosition)
+{
+	const int xCenter = xx;
+	const int yCenter = yy;
+	const int height = 54;
+	const int width = 74;
+
+	const double angle = (turretPosition - 1) * 2 * M_PI / 16 - M_PI / 2;
+
+	return std::make_pair(static_cast<int>(xCenter + std::cos(angle) * width), static_cast<int>(yCenter + std::sin(angle) * height));
+}
+
+static std::pair<int, int> calculateProjectileDistanceInCoordinates(int turretPosition, int time)
+{
+	const double angle = (turretPosition - 1) * 2 * M_PI / 16 - M_PI / 2;
+	auto xExtent = std::cos(angle) * time / 10;
+	auto yExtent = std::sin(angle) * time / 10;
+
+	const int height = 54;
+	const int width = 74;
+	double ratio = static_cast<double>(height) / width;
+
+	xExtent /= ratio;
+	yExtent *= ratio;
+
+	return std::make_pair(static_cast<int>(xExtent), static_cast<int>(yExtent));
+}
+
+void TankWin::drawProjectileInPosition(int xPos, int yPos)
+{
+	BltSurface(backsurf, getProjectileSurface(), xPos, yPos, FALSE);
+
+//	if (timer <= 10)
+//	{
+//		xx1 = 105 + t;
+//		yy1 = 76 + w;
+//		ww1 = y;
+//	}
+//	if (bPul)
+//	{
+//	BltSurface(backsurf, getProjectileSurfaceEraser(), xPos - 37, yy1 - 27 - timer1 * 12, FALSE)
+}
+
+void TankWin::drawExplosion(int xPos, int yPos)
+{
+	if (bVzr && timer <= 124)
+	{
+		BltSurface(backsurf, surfaces[73 + timer / 4].get(), xPos, yPos, TRUE);
+	}
+}
+
+void TankWin::drawProjectile()
+{
+	if (bOgon)
+	{
+		if (timer <= 10)
+		{
+			xx = 105 + t;
+			yy = 76 + w;
+			ww = hh;
+		}
+		const auto canonsTip = calculateCanonsTip(ww);
+		const auto extent = calculateProjectileDistanceInCoordinates(ww, timer * 10);
+
+		const int projectileXPos = canonsTip.first + extent.first;
+		const int projectileYPos = canonsTip.second + extent.second;
+		drawProjectileInPosition(projectileXPos, projectileYPos);
+
+	//	drawExplosion(projectileXPos, projectileYPos);
+	}
 }
 
 void TankWin::DrawScene()
@@ -707,442 +292,14 @@ void TankWin::DrawScene()
 	ClearSurface(backsurf, 0);
 	CRect client;
 	GetClientRect(client);
-	int width = client.Width();
-	int height = client.Height();
+	const int width = client.Width();
+	const int height = client.Height();
 
-	BltSurface(backsurf,surf33,0,0,TRUE);
+	drawSurface();
+	drawTank();
 
+	drawProjectile();
 
-switch (y)	
-{
-			case 1:{BltSurface(backsurf,surfaces.front().get(),20+t,45+w,TRUE);break;}
-
-			case 2:{BltSurface(backsurf,surf2,20+t,45+w,TRUE);break;}
-
-			case 3:{BltSurface(backsurf,surf3,20+t,45+w,TRUE);break;}
-
-			case 4:{BltSurface(backsurf,surf4,20+t,45+w,TRUE);break;}
-
-			case 5:{BltSurface(backsurf,surf5,20+t,45+w,TRUE);break;}
-
-			case 6:{BltSurface(backsurf,surf6,20+t,45+w,TRUE);break;}
-
-			case 7:{BltSurface(backsurf,surf7,20+t,45+w,TRUE);break;}
-
-			case 8:{BltSurface(backsurf,surf8,20+t,45+w,TRUE);break;}
-
-			case 9:{BltSurface(backsurf,surf9,20+t,45+w,TRUE);break;}
-
-			case 10:{BltSurface(backsurf,surf10,20+t,45+w,TRUE);break;}
-
-			case 11:{BltSurface(backsurf,surf11,20+t,45+w,TRUE);break;}
-
-			case 12:{BltSurface(backsurf,surf12,20+t,45+w,TRUE);break;}
-
-			case 13:{BltSurface(backsurf,surf13,20+t,45+w,TRUE);break;}
-
-			case 14:{BltSurface(backsurf,surf14,20+t,45+w,TRUE);break;}
-
-			case 15:{BltSurface(backsurf,surf15,20+t,45+w,TRUE);break;}
-
-			case 16:{BltSurface(backsurf,surf16,20+t,45+w,TRUE);break;}
-
-			if(y==17)
-			{
-				y=1;
-			}
-
-}
-	switch (hh)
-	{
-		case 1: 
-			{
-				BltSurface(backsurf,surf17,20+t,42+w,TRUE);	
-				break;
-			}
-		case 2: 
-			{
-				BltSurface(backsurf,surf18,20+t,42+w,TRUE);
-				break;
-			}
-		case 3: 
-			{
-				BltSurface(backsurf,surf19,20+t,42+w,TRUE);
-				break;
-			}
-		case 4: 
-			{
-				BltSurface(backsurf,surf20,20+t,42+w,TRUE);
-				break;
-			}
-		case 5: 
-			{
-				
-				BltSurface(backsurf,surf21,20+t,42+w,TRUE);
-			
-				break;
-			}
-		case 6: 
-			{
-				BltSurface(backsurf,surf22,20+t,42+w,TRUE);
-				break;
-			}
-		case 7: 
-			{
-				BltSurface(backsurf,surf23,20+t,42+w,TRUE);
-				break;
-			}
-		case 8: 
-			{
-				BltSurface(backsurf,surf24,20+t,42+w,TRUE);
-				break;
-			}
-		case 9: 
-			{
-				BltSurface(backsurf,surf25,20+t,42+w,TRUE);
-				break;
-			}
-		case 10: 
-			{
-				BltSurface(backsurf,surf26,20+t,42+w,TRUE);
-				break;
-			}
-		case 11: 
-			{
-				BltSurface(backsurf,surf27,20+t,42+w,TRUE);
-				break;
-			}
-
-		case 12: 
-			{
-				BltSurface(backsurf,surf28,20+t,42+w,TRUE);
-				break;
-			}
-		case 13: 
-			{
-				BltSurface(backsurf,surf29,20+t,42+w,TRUE);
-				break;
-			}
-		case 14: 
-			{
-				BltSurface(backsurf,surf30,20+t,42+w,TRUE);
-				break;
-			}
-		case 15: 
-			{
-				BltSurface(backsurf,surf31,20+t,42+w,TRUE);
-				break;
-			}
-		case 16: 
-			{
-				BltSurface(backsurf,surf32,20+t,42+w,TRUE);
-				break;
-			}
-				if(hh==17)
-				{
-					hh=1;
-				}
-				
-	}
-	
-	if(bOgon)
-	{
-		if(timer<=10)
-		{
-			xx=105+t;
-			yy=76+w;
-			ww=hh;
-		}
-	
-		switch (ww)
-		{
-				case 1:
-				{BltSurface(backsurf,surf36,xx-37,yy-27-timer*3,FALSE);break;}
-				case 2:
-				{BltSurface(backsurf,surf36,xx-27+(timer*3)*0.414,-28+yy-(timer*3),FALSE);break;}
-				case 3:
-				{BltSurface(backsurf,surf36,xx-18+timer*1.8,yy-18-timer*1.8,FALSE);break;}
-					
-				case 4:
-				{BltSurface(backsurf,surf36,xx-5+(timer*3),yy-14-(timer*3)*0.414,FALSE);break;}
-
-				case 5:
-				{BltSurface(backsurf,surf36,xx+timer*3,yy,FALSE);break;}
-
-				case 6:
-				{BltSurface(backsurf,surf36,xx-5+(timer*3),yy+8+(timer*3)*0.414,FALSE);break;}
-
-				case 7:
-				{BltSurface(backsurf,surf36,xx-15+timer*1.8,yy+15+timer*1.8,FALSE);break;}
-
-				case 8:
-				{BltSurface(backsurf,surf36,xx-28+(timer*3)*0.414,28+yy+(timer*3),FALSE);break;}
-				case 9:
-				{BltSurface(backsurf,surf36,xx-36,yy+27+timer*3,FALSE);break;}
-
-				case 10:
-				{BltSurface(backsurf,surf36,xx-44-(timer*3)*0.414,28+yy+(timer*3),FALSE);break;}
-
-				case 11:
-				{BltSurface(backsurf,surf36,xx-57-timer*1.8,yy+15+timer*1.8,FALSE);break;}
-
-				case 12:
-				{BltSurface(backsurf,surf36,xx-68-(timer*3),yy+7+(timer*3)*0.414,FALSE);break;}
-				
-				case 13:
-				{BltSurface(backsurf,surf36,xx-70-timer*3,yy,FALSE);break;}
-				
-				case 14:
-				{BltSurface(backsurf,surf36,xx-60-(timer*3),yy-12-(timer*3)*0.414,FALSE);break;}
-				
-				case 15:
-				{BltSurface(backsurf,surf36,xx-56-timer*1.8,yy-16-timer*1.8,FALSE);break;}
-				
-				case 16:
-				{BltSurface(backsurf,surf36,xx-48-(timer*3)*0.414,-28+yy-(timer*3),FALSE);break;}
-		}
-	
-	}
-	if(bVzr)
-		{
-			switch(ww)
-			{
-			case 1:
-				{
-					if(timer<=124)
-					{
-						BltSurface(backsurf,surf[timer/4],xx-37-48,yy-27-100*3-40,TRUE);break;
-					}
-					else
-					{
-						bVzr=false;
-					}
-				}
-			case 2:
-				{
-					if(timer<=124)
-					{
-						BltSurface(backsurf,surf[timer/4],xx-60+(100*3)*0.414,yy-(100*3)-106,TRUE);break;
-					}
-					else
-					{
-						bVzr=false;
-					}
-				}
-
-			case 3:
-				{
-					if(timer<=124)
-					{
-						BltSurface(backsurf,surf[timer/4],xx-18+60*3,yy-98-60*3,TRUE);break;
-					}
-					else
-					{
-						bVzr=false;
-					}
-				}
-			case 4:
-				{
-					if(timer<=124)
-					{
-						BltSurface(backsurf,surf[timer/4],xx-5+(100*3),yy-64-(100*3)*0.414,TRUE);break;
-					}
-					else
-					{
-						bVzr=false;
-					}
-				}
-			case 5:
-				{
-					if(timer<=124)
-					{
-						BltSurface(backsurf,surf[timer/4],xx+100*3-48,yy-40,TRUE);break;
-					}
-					else
-					{
-						bVzr=false;
-					}
-				}
-			case 6:
-				{
-					if(timer<=124)
-					{
-						BltSurface(backsurf,surf[timer/4],xx-5+(100*3),yy-10+(100*3)*0.414,TRUE);break;
-					}
-					else
-					{
-						bVzr=false;
-					}
-				}
-			case 7:
-				{
-					if(timer<=124)
-					{
-						BltSurface(backsurf,surf[timer/4],xx-15+60*3,yy+15+60*3,TRUE);break;
-					}
-					else
-					{
-						bVzr=false;
-					}
-				}
-			case 8:
-				{
-					if(timer<=124)
-					{
-						BltSurface(backsurf,surf[timer/4],xx-56+(100*3)*0.414,28+yy+(100*3),TRUE);break;
-					}
-					else
-					{
-						bVzr=false;
-					}
-				}
-			case 9:
-				{
-					if(timer<=124)
-					{
-						BltSurface(backsurf,surf[timer/4],xx-36-48,yy+27+100*3-40,TRUE);break;
-					}
-					else
-					{
-						bVzr=false;
-					}
-				}
-			case 10:
-				{
-					if(timer<=124)
-					{
-						BltSurface(backsurf,surf[timer/4],xx-94-(100*3)*0.414,28+yy+(100*3),TRUE);break;
-					}
-					else
-					{
-						bVzr=false;
-					}
-				}
-			case 11:
-				{
-					if(timer<=124)
-					{
-						BltSurface(backsurf,surf[timer/4],xx-157-60*3,yy+15+60*3,TRUE);break;
-					}
-					else
-					{
-						bVzr=false;
-					}
-				}
-			case 12:
-				{
-					if(timer<=124)
-					{
-						BltSurface(backsurf,surf[timer/4],xx-138-(100*3),yy-14+(100*3)*0.414,TRUE);break;
-					}
-					else
-					{
-						bVzr=false;
-					}
-				}
-			case 13:
-				{
-					if(timer<=124)
-					{
-						BltSurface(backsurf,surf[timer/4],xx-118-100*3,yy-40,TRUE);break;
-					}
-					else
-					{
-						bVzr=false;
-					}
-				}
-			case 14:
-				{
-					if(timer<=124)
-					{
-						BltSurface(backsurf,surf[timer/4],xx-60-(100*3),yy-12-(100*3)*0.414,TRUE);break;
-					}
-					else
-					{
-						bVzr=false;
-					}
-				}
-			case 15:
-				{
-					if(timer<=124)
-					{
-						BltSurface(backsurf,surf[timer/4],xx-136-60*3,yy-98-60*3,TRUE);break;
-					}
-					else
-					{
-						bVzr=false;
-					}
-				}
-			case 16:
-				{
-					if(timer<=124)
-					{
-						BltSurface(backsurf,surf[timer/4],xx-106-(100*3)*0.414,yy-(100*3)-106,TRUE);break;
-					}
-					else
-					{
-						bVzr=false;
-					}
-				}
-			}
-		}
-	if(bPul)
-	{
-		if(timer<=10)
-		{
-			xx1=105+t;
-			yy1=76+w;
-			ww1=y;
-		}
-	
-		switch (ww1)
-		{
-			case 1:
-				{BltSurface(backsurf,surf36,xx1-37,yy1-27-timer1*12,FALSE);break;}
-			case 2:
-				{BltSurface(backsurf,surf36,xx1-27+(timer1*12)*0.414,-28+yy1-(timer1*12),FALSE);break;}
-			case 3:
-				{BltSurface(backsurf,surf36,xx1-18+timer1*12,yy1-18-timer1*12,FALSE);break;}
-				
-			case 4:
-				{BltSurface(backsurf,surf36,xx1-5+(timer1*12),yy1-14-(timer1*12)*0.414,FALSE);break;}
-
-				case 5:
-				{BltSurface(backsurf,surf36,xx1+timer1*12,yy1,FALSE);break;}
-
-				case 6:
-				{BltSurface(backsurf,surf36,xx1-5+(timer1*12),yy1+8+(timer1*12)*0.414,FALSE);break;}
-
-				case 7:
-				{BltSurface(backsurf,surf36,xx1-15+timer1*12,yy1+15+timer1*12,FALSE);break;}
-
-				case 8:
-				{BltSurface(backsurf,surf36,xx1-28+(timer1*12)*0.414,28+yy1+(timer1*12),FALSE);break;}
-				case 9:
-				{BltSurface(backsurf,surf36,xx1-36,yy1+27+timer1*12,FALSE);break;}
-
-				case 10:
-				{BltSurface(backsurf,surf36,xx1-44-(timer1*12)*0.414,28+yy1+(timer1*12),FALSE);break;}
-
-				case 11:
-				{BltSurface(backsurf,surf36,xx1-57-timer1*12,yy1+15+timer1*12,FALSE);break;}
-
-				case 12:
-				{BltSurface(backsurf,surf36,xx1-68-(timer1*12),yy1+7+(timer1*12)*0.414,FALSE);break;}
-				
-				case 13:
-				{BltSurface(backsurf,surf36,xx1-70-timer1*12,yy1,FALSE);break;}
-				
-				case 14:
-				{BltSurface(backsurf,surf36,xx1-60-(timer1*12),yy1-12-(timer1*12)*0.414,FALSE);break;}
-				
-				case 15:
-				{BltSurface(backsurf,surf36,xx1-56-timer1*12,yy1-16-timer1*12,FALSE);break;}
-				
-				case 16:
-				{BltSurface(backsurf,surf36,xx1-48-(timer1*12)*0.414,-28+yy1-(timer1*12),FALSE);break;}
-		}
-	}
 ///	primsurf->Flip( 0, DDFLIP_WAIT );
 	CRect screenRect = client;
 	ClientToScreen(screenRect);
@@ -1151,232 +308,14 @@ switch (y)
 
 void TankWin::RestoreSurfaces()
 {
-if(surfaces.front()->IsLost()==FALSE)
-return;
-CString filename;
-filename="tankback.bmp";
-surfaces.front()->Restore();
-LoadSurface(surfaces.front().get(),filename);
-
-if(surf2->IsLost()==FALSE)
-return;
-filename="tankright1.bmp";
-surf2->Restore();
-LoadSurface(surf2,filename);
-
-if(surf3->IsLost()==FALSE)
-return;
-filename="tankrightback.bmp";
-surf3->Restore();
-LoadSurface(surf3,filename);
-
-if(surf4->IsLost()==FALSE)
-return;
-filename="tankright2.bmp";
-surf4->Restore();
-LoadSurface(surf4,filename);
-
-if(surf5->IsLost()==FALSE)
-return;
-filename="tankright3.bmp";//
-surf5->Restore();
-LoadSurface(surf5,filename);
-
-if(surf6->IsLost()==FALSE)
-return;
-filename="tankright4.bmp";//
-surf6->Restore();
-LoadSurface(surf6,filename);
-
-if(surf7->IsLost()==FALSE)
-return;
-filename="tankright6.bmp";//
-surf7->Restore();
-LoadSurface(surf7,filename);
-
-if(surf8->IsLost()==FALSE)
-return;
-filename="tankright7.bmp";//
-surf8->Restore();
-LoadSurface(surf8,filename);
-
-if(surf9->IsLost()==FALSE)
-return;
-filename="tankfront.bmp";
-surf9->Restore();
-LoadSurface(surf9,filename);
-
-if(surf10->IsLost()==FALSE)
-return;
-filename="tankleft4.bmp";
-surf10->Restore();
-LoadSurface(surf10,filename);
-
-if(surf11->IsLost()==FALSE)
-return;
-filename="tankleftfront.bmp";
-surf11->Restore();
-LoadSurface(surf11,filename);
-
-if(surf12->IsLost()==FALSE)
-return;
-filename="tankleft3.bmp";
-surf12->Restore();
-LoadSurface(surf12,filename);
-
-if(surf13->IsLost()==FALSE)
-return;
-filename="tankleft.bmp";//
-surf13->Restore();
-LoadSurface(surf13,filename);
-
-if(surf14->IsLost()==FALSE)
-return;
-filename="tankleft23.bmp";//
-surf14->Restore();
-LoadSurface(surf14,filename);
-
-if(surf15->IsLost()==FALSE)
-return;
-filename="tankleftback.bmp";//
-surf15->Restore();
-LoadSurface(surf15,filename);
-
-if(surf16->IsLost()==FALSE)
-return;
-filename="tankleft1.bmp";//
-surf16->Restore();
-LoadSurface(surf16,filename);
-
-if(surf17->IsLost()==FALSE)
-return;
-filename="1.bmp";//
-surf17->Restore();
-LoadSurface(surf17,filename);
-
-if(surf18->IsLost()==FALSE)
-return;
-filename="2.bmp";//
-surf18->Restore();
-LoadSurface(surf18,filename);
-
-if(surf19->IsLost()==FALSE)
-return;
-filename="3.BMP";//
-surf19->Restore();
-LoadSurface(surf19,filename);
-
-if(surf20->IsLost()==FALSE)
-return;
-filename="4.BMP";//
-surf20->Restore();
-LoadSurface(surf20,filename);
-
-if(surf21->IsLost()==FALSE)
-return;
-filename="5.BMP";//
-surf21->Restore();
-LoadSurface(surf21,filename);
-
-if(surf22->IsLost()==FALSE)
-return;
-filename="6.BMP";//
-surf22->Restore();
-LoadSurface(surf22,filename);
-
-if(surf23->IsLost()==FALSE)
-return;
-filename="7.BMP";
-surf23->Restore();
-LoadSurface(surf23,filename);
-
-if(surf24->IsLost()==FALSE)
-return;
-filename="8.BMP";
-surf24->Restore();
-LoadSurface(surf24,filename);
-
-if(surf25->IsLost()==FALSE)
-return;
-filename="9.BMP";
-surf25->Restore();
-LoadSurface(surf25,filename);
-
-if(surf26->IsLost()==FALSE)
-return;
-filename="10.BMP";
-surf26->Restore();
-LoadSurface(surf26,filename);
-
-if(surf27->IsLost()==FALSE)
-return;
-filename="11.BMP";
-surf27->Restore();
-LoadSurface(surf27,filename);
-
-if(surf28->IsLost()==FALSE)
-return;
-filename="12.BMP";
-surf28->Restore();
-LoadSurface(surf28,filename);
-
-if(surf29->IsLost()==FALSE)
-return;
-filename="13.BMP";
-surf29->Restore();
-LoadSurface(surf29,filename);
-
-if(surf30->IsLost()==FALSE)
-return;
-filename="14.BMP";
-surf30->Restore();
-LoadSurface(surf30,filename);
-
-if(surf31->IsLost()==FALSE)
-return;
-filename="15.BMP";
-surf31->Restore();
-LoadSurface(surf31,filename);
-
-if(surf32->IsLost()==FALSE)
-return;
-filename="16.BMP";
-surf32->Restore();
-LoadSurface(surf32,filename);
-
-if(surf33->IsLost()==FALSE)
-return;
-filename="ter.BMP";
-surf33->Restore();
-LoadSurface(surf33,filename);
-
-if(surf34->IsLost()==FALSE)
-return;
-filename="trackh.BMP";
-surf34->Restore();
-LoadSurface(surf34,filename);
-
-if(surf35->IsLost()==FALSE)
-return;
-filename="trackv.BMP";
-surf35->Restore();
-LoadSurface(surf35,filename);
-
-if(surf36->IsLost()==FALSE)
-return;
-filename="point.BMP";
-surf36->Restore();
-LoadSurface(surf36,filename);
-
-	for(int i1=101; i1<=132; i1++)
+	for (size_t index = 0; index < surfaces.size(); ++index)
 	{
-		if(surf[i1-101]->IsLost()==FALSE)
-		return;
-		filename.Format("%i1.bmp",i1);
-			surf[i1-101]->Restore();
-			LoadSurface(surf[i1-101],filename);
+		if (surfaces[index]->IsLost() != FALSE)
+		{
+			surfaces[index]->Restore();
+			LoadSurface(surfaces[index].get(), fileNameMapping[index].c_str());
+		}
 	}
-
 }
 
 int TankWin::SelectDriver()

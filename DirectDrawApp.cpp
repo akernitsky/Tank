@@ -35,7 +35,6 @@ BOOL DirectDrawApp::InitInstance()
 
 BOOL DirectDrawApp::OnIdle(LONG) 
 {
-
 	timer1++;
 	timer++;
 

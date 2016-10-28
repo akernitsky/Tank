@@ -601,7 +601,7 @@ BOOL DirectDrawWin::CreatePalette(RGBQUAD* quad, int ncolors)
 	return TRUE;
 }
 
-LPDIRECTDRAWSURFACE DirectDrawWin::CreateSurface(const std::string& filename, bool installpalette)
+LPDIRECTDRAWSURFACE DirectDrawWin::CreateSurface(const std::wstring& filename, bool installpalette)
 {
 	int imagew, imageh;
 	GetBmpDimensions( filename.c_str(), imagew, imageh );
@@ -717,8 +717,7 @@ DirectDrawWin::DirectDrawWin() :
 	loGREENbit(0),
 	numGREENbits(0),
 	loBLUEbit(0),
-	numBLUEbits(0),
-	surfaces()
+	numBLUEbits(0)
 {
 	thisptr=this;
 
@@ -773,8 +772,8 @@ BOOL WINAPI DirectDrawWin::DriverAvailable(LPGUID guid, LPSTR desc, LPSTR name, 
 	else
 		info.guid=0;
 
-	info.desc=strdup( desc );
-	info.name=strdup( name );
+	info.desc=_strdup( desc );
+	info.name=_strdup( name );
 
 	win->totaldrivers++;
 
@@ -1028,7 +1027,7 @@ int DirectDrawWin::OnCreate(LPCREATESTRUCT)
 	HRESULT hr = ddraw1->QueryInterface(IID_IDirectDraw2, reinterpret_cast<void**>(&ddraw2));
 	if (hr != S_OK)
 	{
-		AfxMessageBox("DirectDraw2 interface not supported");
+		AfxMessageBox(L"DirectDraw2 interface not supported");
 		return -1;
 	}
 	ddraw1->Release();
@@ -1040,13 +1039,13 @@ int DirectDrawWin::OnCreate(LPCREATESTRUCT)
 
 	if (CreateFlippingSurfaces() == FALSE)
 	{
-		AfxMessageBox("CreateFlippingSurfaces() failed");
+		AfxMessageBox(L"CreateFlippingSurfaces() failed");
 		return FALSE;
 	}
 	StorePixelFormatData();
 	if (CreateCustomSurfaces() == FALSE)
 	{
-		AfxMessageBox("CreateCustomSurfaces() failed");
+		AfxMessageBox(L"CreateCustomSurfaces() failed");
 		return FALSE;
 	}
 
@@ -1283,7 +1282,8 @@ BOOL DirectDrawWin::SaveSurface(LPDIRECTDRAWSURFACE surf, LPCTSTR filename)
 		}
 	}
 
-	FILE* fp=fopen( filename, "wb" );
+	FILE* fp = nullptr;
+	_wfopen_s( &fp, filename, L"wb" );
 	fwrite( &filehdr, sizeof(filehdr), 1, fp );
 	fwrite( &infohdr, sizeof(infohdr), 1, fp );
 	if (depth==8)
