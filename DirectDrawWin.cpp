@@ -1084,7 +1084,7 @@ void DirectDrawWin::OnDestroy()
 	if (ddraw2)
 		ddraw2->Release(), ddraw2=0;
 
-	if (clipper)
+	if (clipper != nullptr)
 	{
 		clipper->Release();
 		clipper = nullptr;
