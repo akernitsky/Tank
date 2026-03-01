@@ -27,6 +27,26 @@ int xx1 = 0;
 int yy1 = 0;
 
 
+
+namespace
+{
+	const int kMinDirection = 1;
+	const int kMaxDirection = 16;
+	const int kDirectionCount = 16;
+
+	void normalizeDirection(int& direction)
+	{
+		while (direction > kMaxDirection)
+		{
+			direction -= kDirectionCount;
+		}
+		while (direction < kMinDirection)
+		{
+			direction += kDirectionCount;
+		}
+	}
+}
+
 BEGIN_MESSAGE_MAP(TankWin, DirectDrawWin)
 	//{{AFX_MSG_MAP(TankWin)
 	ON_WM_KEYDOWN()
@@ -76,85 +96,40 @@ void TankWin::addToSurfaces(IDirectDrawSurface* surface)
 
 void TankWin::createSurfaces()
 {
-	fileNameMapping = { 
-		std::make_pair(0, L"tankback.bmp"),
-		std::make_pair(1, L"tankright1.bmp"),
-		std::make_pair(2, L"tankrightback.bmp"),
-		std::make_pair(3, L"tankright2.bmp"),
-		std::make_pair(4, L"tankright3.bmp"),
-		std::make_pair(5, L"tankright4.bmp"),
-		std::make_pair(6, L"tankright6.bmp"),
-		std::make_pair(7, L"tankright7.bmp"),
-		std::make_pair(8, L"tankfront.bmp"),
-		std::make_pair(9, L"tankleft4.bmp"),
-		std::make_pair(10, L"tankleftfront.bmp"),
-		std::make_pair(11, L"tankleft3.bmp"),
-		std::make_pair(12, L"tankleft.bmp"),
-		std::make_pair(13, L"tankleft23.bmp"),
-		std::make_pair(14, L"tankleftback.bmp"),
-		std::make_pair(15, L"tankleft1.bmp"),
-		std::make_pair(16, L"1.bmp"),
-		std::make_pair(17, L"2.bmp"),
-		std::make_pair(18, L"3.bmp"),
-		std::make_pair(19, L"4.bmp"),
-		std::make_pair(20, L"5.bmp"),
-		std::make_pair(21, L"6.bmp"),
-		std::make_pair(22, L"7.bmp"),
-		std::make_pair(23, L"8.bmp"),
-		std::make_pair(24, L"9.bmp"),
-		std::make_pair(25, L"10.bmp"),
-		std::make_pair(26, L"11.bmp"),
-		std::make_pair(27, L"12.bmp"),
-		std::make_pair(28, L"13.bmp"),
-		std::make_pair(29, L"14.bmp"),
-		std::make_pair(30, L"15.bmp"),
-		std::make_pair(31, L"16.bmp"),
-		std::make_pair(32, L"ter.bmp"),
-		std::make_pair(33, L"trackh.bmp"),
-		std::make_pair(34, L"trackv.bmp"),
-		std::make_pair(35, L"point.bmp"),
-		std::make_pair(36, L"er.bmp"),
-		std::make_pair(37, L"tankback.bmp"),
-		std::make_pair(38, L"tankright1.bmp"),
-		std::make_pair(39, L"tankrightback.bmp"),
-		std::make_pair(40, L"tankright2.bmp"),
-		std::make_pair(41, L"tankright3.bmp"),
-		std::make_pair(42, L"tankright4.bmp"),
-		std::make_pair(43, L"tankright6.bmp"),
-		std::make_pair(44, L"tankright7.bmp"),
-		std::make_pair(45, L"tankfront.bmp"),
-		std::make_pair(46, L"tankleft4.bmp"),
-		std::make_pair(47, L"tankleftfront.bmp"),
-		std::make_pair(48, L"tankleft3.bmp"),
-		std::make_pair(49, L"tankleft.bmp"),
-		std::make_pair(50, L"tankleft23.bmp"),
-		std::make_pair(51, L"tankleftback.bmp"),
-		std::make_pair(52, L"tankleft1.bmp"),
-		std::make_pair(53, L"1.bmp"),
-		std::make_pair(54, L"2.bmp"),
-		std::make_pair(55, L"3.BMP"),
-		std::make_pair(56, L"4.BMP"),
-		std::make_pair(57, L"5.BMP"),
-		std::make_pair(58, L"6.BMP"),
-		std::make_pair(59, L"7.BMP"),
-		std::make_pair(60, L"8.BMP"),
-		std::make_pair(61, L"9.BMP"),
-		std::make_pair(62, L"10.BMP"),
-		std::make_pair(63, L"11.BMP"),
-		std::make_pair(64, L"12.BMP"),
-		std::make_pair(65, L"13.BMP"),
-		std::make_pair(66, L"14.BMP"),
-		std::make_pair(67, L"15.BMP"),
-		std::make_pair(68, L"16.BMP"),
-		std::make_pair(69, L"ter.BMP"),
-		std::make_pair(70, L"trackh.BMP"),
-		std::make_pair(71, L"trackv.BMP"),
-		std::make_pair(72, L"point.BMP") 
+	const std::vector<std::wstring> staticSurfaceFiles = {
+		L"tankback.bmp", L"tankright1.bmp", L"tankrightback.bmp", L"tankright2.bmp", L"tankright3.bmp", L"tankright4.bmp", L"tankright6.bmp", L"tankright7.bmp",
+		L"tankfront.bmp", L"tankleft4.bmp", L"tankleftfront.bmp", L"tankleft3.bmp", L"tankleft.bmp", L"tankleft23.bmp", L"tankleftback.bmp", L"tankleft1.bmp",
+		L"1.bmp", L"2.bmp", L"3.bmp", L"4.bmp", L"5.bmp", L"6.bmp", L"7.bmp", L"8.bmp", L"9.bmp", L"10.bmp", L"11.bmp", L"12.bmp", L"13.bmp", L"14.bmp", L"15.bmp", L"16.bmp",
+		L"ter.bmp", L"trackh.bmp", L"trackv.bmp", L"point.bmp", L"er.bmp"
 	};
 
+	fileNameMapping.clear();
+	for (size_t i = 0; i < staticSurfaceFiles.size(); ++i)
+	{
+		fileNameMapping[static_cast<int>(i)] = staticSurfaceFiles[i];
+	}
+
+	const int upperCaseOffset = static_cast<int>(fileNameMapping.size());
+	for (size_t i = 0; i < staticSurfaceFiles.size() - 1; ++i)
+	{
+		std::wstring name = staticSurfaceFiles[i];
+		if (i >= 18)
+		{
+			for (auto& ch : name)
+			{
+				if (ch >= L'a' && ch <= L'z')
+				{
+					ch = ch - L'a' + L'A';
+				}
+			}
+		}
+		fileNameMapping[upperCaseOffset + static_cast<int>(i)] = name;
+	}
+
+	const int explosionOffset = static_cast<int>(fileNameMapping.size());
 	for (int i = 101; i <= 132; ++i)
 	{
-		fileNameMapping.insert(fileNameMapping.end(), std::make_pair(i - 101 + 73, std::to_wstring(i) + L".bmp"));
+		fileNameMapping[explosionOffset + i - 101] = std::to_wstring(i) + L".bmp";
 	}
 
 	for (const auto& element : fileNameMapping)
@@ -338,7 +313,7 @@ int TankWin::SelectInitialDisplayMode()
 	for (i=0;i<nummodes;i++)
 	{
 		GetDisplayModeDimensions( i, wd, h, d );
-		if (w==desiredwidth && h==desiredheight && d==desireddepth)
+		if (wd==desiredwidth && h==desiredheight && d==desireddepth)
 			return i;
 	}
 
@@ -354,153 +329,93 @@ int TankWin::SelectInitialDisplayMode()
 
 void TankWin::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags) 
 {
-	if(nChar==VK_SHIFT && bPul==false)
+	switch (nChar)
 	{
-		//timer=0;
-		bPul=true;
+	case VK_SHIFT:
+		if (!bPul)
+		{
+			bPul = true;
+		}
+		break;
+	case VK_RETURN:
+		if (!bOgon)
+		{
+			timer = 1;
+			bOgon = true;
+		}
+		break;
+	case VK_ESCAPE:
+		PostMessage(WM_CLOSE);
+		break;
+	case VK_SPACE:
+		++y;
+		++hh;
+		break;
+	case VK_RIGHT:
+		bOgon = false;
+		if (y == 5)
+		{
+			++t;
+		}
+		else
+		{
+			const int directionDelta = (y >= 6 && y <= 13) ? -1 : 1;
+			y += directionDelta;
+			hh += directionDelta;
+		}
+		break;
+	case VK_LEFT:
+		bOgon = false;
+		if (y == 13)
+		{
+			--t;
+		}
+		else
+		{
+			const int directionDelta = (y >= 5 && y <= 12) ? 1 : -1;
+			y += directionDelta;
+			hh += directionDelta;
+		}
+		break;
+	case VK_UP:
+		bOgon = false;
+		if (y == 1)
+		{
+			--w;
+		}
+		else
+		{
+			const int directionDelta = (y >= 2 && y <= 9) ? -1 : 1;
+			y += directionDelta;
+			hh += directionDelta;
+		}
+		break;
+	case VK_DOWN:
+		bOgon = false;
+		if (y == 9)
+		{
+			++w;
+		}
+		else
+		{
+			const int directionDelta = (y >= 10 && y <= 16) ? -1 : 1;
+			y += directionDelta;
+			hh += directionDelta;
+		}
+		break;
+	case VK_END:
+		bOgon = false;
+		++hh;
+		break;
+	case VK_HOME:
+		bOgon = false;
+		--hh;
+		break;
+	default:
+		break;
 	}
 
-	if(nChar == VK_RETURN && bOgon == false)
-	{
-		timer = 1;
-		bOgon = true;
-	}
-	
-	if (nChar == VK_ESCAPE)
-	{
-		PostMessage( WM_CLOSE );
-	}
-	
-	if (nChar == VK_SPACE)
-	{
-		y++;
-		hh++;
-	}
-	
-	if(nChar==VK_RIGHT) 
-	{
-		bOgon=false;
-		if(y==5)
-		{
-			t=t+1;
-		}
-		else
-		{
-			if(y>=6 && y<=13 )
-			{
-				y--;
-				hh--;
-			}
-			else
-			{
-				y++; 
-				hh++; 
-			} 
-		}
-	}
-	
-	if(nChar==VK_LEFT) 
-	{
-		bOgon=false;
-		if(y==13)
-		{
-			t=t-1;
-		} 
-		else
-		{
-			if(y>=5 && y<=12)
-			{
-				y++;
-				hh++;
-			}
-			else
-			{
-				y--;
-				hh--;
-			} 
-		}
-	}
-	
-	if(nChar==VK_UP)
-	{
-		bOgon=false;
-		if(y==1)
-		{
-			w=w-1;
-		} 
-		else
-		{
-			if(y>=2 && y<=9)
-			{
-				y--;
-				hh--;	
-			}
-			else
-			{
-				y++;
-				hh++;
-			} 
-		}
-	}	
-	
-	if(nChar==VK_DOWN)
-	{
-		bOgon=false;
-		if(y==9)
-		{
-			w=w+1;
-		} 
-		else
-		{
-			if(y>=10 && y<=16)
-			{
-				y--;
-				hh--;
-		
-			}
-			else
-			{
-				y++;
-				hh++;
-			} 
-		}
-	}	
-	
-	if (nChar==VK_END)
-	{
-		bOgon=false;
-		hh++; 
-		if(hh>=17)
-		{
-			hh=1;
-		}
-	}
-	if (nChar==VK_HOME)
-	{
-		bOgon=false;
-		hh--; 
-		if(hh<=0)
-		{
-			hh=hh+16;
-		}
-	}
-
-		if(hh>=17)
-	{
-		hh=hh-16;
-	}
-	
-	if(hh<=0)
-	{
-		hh=hh+16;
-	}
-	if(y>=17)
-	{
-		y=y-16;
-	}
-	if(y<=0)
-	{
-		y=y+16;
-	}
+	normalizeDirection(hh);
+	normalizeDirection(y);
 	DirectDrawWin::OnKeyDown(nChar, nRepCnt, nFlags);
 }
