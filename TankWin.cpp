@@ -338,7 +338,7 @@ int TankWin::SelectInitialDisplayMode()
 	for (i=0;i<nummodes;i++)
 	{
 		GetDisplayModeDimensions( i, wd, h, d );
-		if (w==desiredwidth && h==desiredheight && d==desireddepth)
+		if (wd==desiredwidth && h==desiredheight && d==desireddepth)
 			return i;
 	}
 
