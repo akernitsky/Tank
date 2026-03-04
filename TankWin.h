@@ -7,15 +7,15 @@
 class TankWin : public DirectDrawWin
 {
 public:
-	
-	int k;
-	BOOL right;
-	int w;
-	int y;
-	int t;
-	int hh;
-	int ww;
-	int ww1;
+
+	int animationTick;
+	BOOL isFacingRight;
+	int tankY;
+	int hullDirection;
+	int tankX;
+	int turretDirection;
+	int activeProjectileDirection;
+	int previousProjectileDirection = 0;
 	TankWin();
 
 protected:
@@ -44,7 +44,7 @@ private:
 	void drawTankHull();
 	void drawTankTurret();
 	std::pair<int, int> calculateCanonsTip(int turretPosition);
-	void drawProjectileInPosition(int xx, int yy);
+	void drawProjectileInPosition(int xPos, int yPos);
 	void drawProjectile();
 	void drawExplosion(int xPos, int yPos);
 	IDirectDrawSurface* getProjectileSurfaceEraser();
