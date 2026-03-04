@@ -20,11 +20,8 @@ const DWORD desiredwidth = 2880;
 const DWORD desiredheight = 1800;
 const DWORD desireddepth = 32;
 
-int xx = 0;
-int yy = 0;
-
-int xx1 = 0;
-int yy1 = 0;
+int projectileOriginX = 0;
+int projectileOriginY = 0;
 
 
 
@@ -57,21 +54,21 @@ END_MESSAGE_MAP()
 
 TankWin::TankWin()
 {
-	right=FALSE;	
-	k=500;
+	isFacingRight = FALSE;
+	animationTick = 500;
 
 
-	t = 100;
-	w = 100;
-	y = 5;
-	hh = 5;
+	tankX = 100;
+	tankY = 100;
+	hullDirection = 5;
+	turretDirection = 5;
 	bOgon = false;
 }
 
 LPDIRECTDRAWSURFACE TankWin::createCustomSurface(const std::wstring& fileName)
 {
 	LPDIRECTDRAWSURFACE surf = CreateSurface(fileName);
-	
+
 	if(surf == 0)
 	{
 		const std::wstring errorText = std::wstring(L"failed to load: " + fileName);
@@ -82,14 +79,14 @@ LPDIRECTDRAWSURFACE TankWin::createCustomSurface(const std::wstring& fileName)
 void TankWin::addToSurfaces(IDirectDrawSurface* surface)
 {
 	assert(surface != nullptr);
-	
+
 	if (surface != nullptr)
-	{	
+	{
 		DDCOLORKEY colorkey;
 		colorkey.dwColorSpaceLowValue = 0;
 		colorkey.dwColorSpaceHighValue = 0;
 		surface->SetColorKey(DDCKEY_SRCBLT, &colorkey);
-		
+
 		surfaces.push_back(std::shared_ptr<IDirectDrawSurface>(surface, std::mem_fn(&IUnknown::Release)));
 	}
 }
@@ -195,18 +192,18 @@ void TankWin::drawTank()
 
 void TankWin::drawTankHull()
 {
-	BltSurface(backsurf, surfaces[y - 1].get(), 20 + t, 45 + w, TRUE);
+	BltSurface(backsurf, surfaces[hullDirection - 1].get(), 20 + tankX, 45 + tankY, TRUE);
 }
 
 void TankWin::drawTankTurret()
 {
-	BltSurface(backsurf, surfaces[hh + 16 - 1].get(), 20 + t, 42 + w, TRUE);
+	BltSurface(backsurf, surfaces[turretDirection + 16 - 1].get(), 20 + tankX, 42 + tankY, TRUE);
 }
 
 std::pair<int, int> TankWin::calculateCanonsTip(int turretPosition)
 {
-	const int xCenter = xx;
-	const int yCenter = yy;
+	const int xCenter = projectileOriginX;
+	const int yCenter = projectileOriginY;
 	const int height = 54;
 	const int width = 74;
 
@@ -250,12 +247,12 @@ void TankWin::drawProjectile()
 	{
 		if (timer <= 10)
 		{
-			xx = 105 + t;
-			yy = 76 + w;
-			ww = hh;
+			projectileOriginX = 105 + tankX;
+			projectileOriginY = 76 + tankY;
+			activeProjectileDirection = turretDirection;
 		}
-		const auto canonsTip = calculateCanonsTip(ww);
-		const auto extent = calculateProjectileDistanceInCoordinates(ww, timer / 3);
+		const auto canonsTip = calculateCanonsTip(activeProjectileDirection);
+		const auto extent = calculateProjectileDistanceInCoordinates(activeProjectileDirection, timer / 3);
 
 		const int projectileXPos = canonsTip.first + extent.first;
 		const int projectileYPos = canonsTip.second + extent.second;
@@ -346,7 +343,7 @@ int TankWin::SelectInitialDisplayMode()
 	return 0;
 }
 
-void TankWin::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags) 
+void TankWin::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
 	switch (nChar)
 	{
@@ -367,74 +364,74 @@ void TankWin::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 		PostMessage(WM_CLOSE);
 		break;
 	case VK_SPACE:
-		++y;
-		++hh;
+		++hullDirection;
+		++turretDirection;
 		break;
 	case VK_RIGHT:
 		bOgon = false;
-		if (y == 5)
+		if (hullDirection == 5)
 		{
-			++t;
+			++tankX;
 		}
 		else
 		{
-			const int directionDelta = (y >= 6 && y <= 13) ? -1 : 1;
-			y += directionDelta;
-			hh += directionDelta;
+			const int directionDelta = (hullDirection >= 6 && hullDirection <= 13) ? -1 : 1;
+			hullDirection += directionDelta;
+			turretDirection += directionDelta;
 		}
 		break;
 	case VK_LEFT:
 		bOgon = false;
-		if (y == 13)
+		if (hullDirection == 13)
 		{
-			--t;
+			--tankX;
 		}
 		else
 		{
-			const int directionDelta = (y >= 5 && y <= 12) ? 1 : -1;
-			y += directionDelta;
-			hh += directionDelta;
+			const int directionDelta = (hullDirection >= 5 && hullDirection <= 12) ? 1 : -1;
+			hullDirection += directionDelta;
+			turretDirection += directionDelta;
 		}
 		break;
 	case VK_UP:
 		bOgon = false;
-		if (y == 1)
+		if (hullDirection == 1)
 		{
-			--w;
+			--tankY;
 		}
 		else
 		{
-			const int directionDelta = (y >= 2 && y <= 9) ? -1 : 1;
-			y += directionDelta;
-			hh += directionDelta;
+			const int directionDelta = (hullDirection >= 2 && hullDirection <= 9) ? -1 : 1;
+			hullDirection += directionDelta;
+			turretDirection += directionDelta;
 		}
 		break;
 	case VK_DOWN:
 		bOgon = false;
-		if (y == 9)
+		if (hullDirection == 9)
 		{
-			++w;
+			++tankY;
 		}
 		else
 		{
-			const int directionDelta = (y >= 10 && y <= 16) ? -1 : 1;
-			y += directionDelta;
-			hh += directionDelta;
+			const int directionDelta = (hullDirection >= 10 && hullDirection <= 16) ? -1 : 1;
+			hullDirection += directionDelta;
+			turretDirection += directionDelta;
 		}
 		break;
 	case VK_END:
 		bOgon = false;
-		++hh;
+		++turretDirection;
 		break;
 	case VK_HOME:
 		bOgon = false;
-		--hh;
+		--turretDirection;
 		break;
 	default:
 		break;
 	}
 
-	normalizeDirection(hh);
-	normalizeDirection(y);
+	normalizeDirection(turretDirection);
+	normalizeDirection(hullDirection);
 	DirectDrawWin::OnKeyDown(nChar, nRepCnt, nFlags);
 }
