@@ -50,6 +50,12 @@ private:
   int SelectDriver();
   BOOL UpdateAviSurface();
   int SelectInitialDisplayMode();
+  bool HandleFireKeys(UINT nChar);
+  bool HandleSystemKeys(UINT nChar);
+  bool HandleHullMovementKey(UINT nChar);
+  bool HandleTurretKey(UINT nChar);
+  void RotateHullAndTurretToward(int targetDirection, int minTurn, int maxTurn,
+                                   bool decrementInRange);
   BOOL CreateCustomSurfaces();
   void DrawScene();
   void addToSurfaces(IDirectDrawSurface *surface);

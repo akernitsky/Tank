@@ -375,92 +375,113 @@ int TankWin::SelectInitialDisplayMode() {
   return kDefaultDisplayModeIndex;
 }
 
-void TankWin::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags) {
+void TankWin::RotateHullAndTurretToward(int targetDirection, int minTurn,
+                                       int maxTurn,
+                                       bool decrementInRange) {
+  if (tank.hullDirection == targetDirection) {
+    return;
+  }
+
+  const int directionDelta =
+      (tank.hullDirection >= minTurn && tank.hullDirection <= maxTurn)
+          ? (decrementInRange ? -kDirectionToIndexOffset
+                              : kDirectionToIndexOffset)
+          : (decrementInRange ? kDirectionToIndexOffset
+                              : -kDirectionToIndexOffset);
+  tank.hullDirection += directionDelta;
+  tank.turret.direction += directionDelta;
+}
+
+bool TankWin::HandleFireKeys(UINT nChar) {
   switch (nChar) {
   case VK_SHIFT:
     if (!projectile.isTriggered) {
       projectile.isTriggered = true;
     }
-    break;
+    return true;
   case VK_RETURN:
     if (!projectile.isFiring && !bVzr) {
       timer = kInitialFireTimer;
       projectile.isFiring = true;
     }
-    break;
-  case VK_ESCAPE:
+    return true;
+  default:
+    return false;
+  }
+}
+
+bool TankWin::HandleSystemKeys(UINT nChar) {
+  if (nChar == VK_ESCAPE) {
     PostMessage(WM_CLOSE);
-    break;
-  case VK_SPACE:
-    ++tank.hullDirection;
-    ++tank.turret.direction;
-    break;
+    return true;
+  }
+  return false;
+}
+
+bool TankWin::HandleHullMovementKey(UINT nChar) {
+  switch (nChar) {
   case VK_RIGHT:
     projectile.isFiring = false;
     if (tank.hullDirection == kDirectionRight) {
       ++tank.x;
     } else {
-      const int directionDelta =
-          (tank.hullDirection >= kRightMinTurn &&
-           tank.hullDirection <= kRightMaxTurn)
-              ? -kDirectionToIndexOffset
-              : kDirectionToIndexOffset;
-      tank.hullDirection += directionDelta;
-      tank.turret.direction += directionDelta;
+      RotateHullAndTurretToward(kDirectionRight, kRightMinTurn,
+                             kRightMaxTurn, true);
     }
-    break;
+    return true;
   case VK_LEFT:
     projectile.isFiring = false;
     if (tank.hullDirection == kDirectionLeft) {
       --tank.x;
     } else {
-      const int directionDelta =
-          (tank.hullDirection >= kLeftMinTurn &&
-           tank.hullDirection <= kLeftMaxTurn)
-              ? kDirectionToIndexOffset
-              : -kDirectionToIndexOffset;
-      tank.hullDirection += directionDelta;
-      tank.turret.direction += directionDelta;
+      RotateHullAndTurretToward(kDirectionLeft, kLeftMinTurn,
+                             kLeftMaxTurn, false);
     }
-    break;
+    return true;
   case VK_UP:
     projectile.isFiring = false;
     if (tank.hullDirection == kDirectionUp) {
       --tank.y;
     } else {
-      const int directionDelta =
-          (tank.hullDirection >= kUpMinTurn && tank.hullDirection <= kUpMaxTurn)
-              ? -kDirectionToIndexOffset
-              : kDirectionToIndexOffset;
-      tank.hullDirection += directionDelta;
-      tank.turret.direction += directionDelta;
+      RotateHullAndTurretToward(kDirectionUp, kUpMinTurn, kUpMaxTurn, true);
     }
-    break;
+    return true;
   case VK_DOWN:
     projectile.isFiring = false;
     if (tank.hullDirection == kDirectionDown) {
       ++tank.y;
     } else {
-      const int directionDelta =
-          (tank.hullDirection >= kDownMinTurn &&
-           tank.hullDirection <= kDownMaxTurn)
-              ? -kDirectionToIndexOffset
-              : kDirectionToIndexOffset;
-      tank.hullDirection += directionDelta;
-      tank.turret.direction += directionDelta;
+      RotateHullAndTurretToward(kDirectionDown, kDownMinTurn,
+                             kDownMaxTurn, true);
     }
-    break;
+    return true;
+  case VK_SPACE:
+    ++tank.hullDirection;
+    ++tank.turret.direction;
+    return true;
+  default:
+    return false;
+  }
+}
+
+bool TankWin::HandleTurretKey(UINT nChar) {
+  switch (nChar) {
   case VK_END:
     projectile.isFiring = false;
     ++tank.turret.direction;
-    break;
+    return true;
   case VK_HOME:
     projectile.isFiring = false;
     --tank.turret.direction;
-    break;
+    return true;
   default:
-    break;
+    return false;
   }
+}
+
+void TankWin::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags) {
+  HandleFireKeys(nChar) || HandleSystemKeys(nChar) ||
+      HandleHullMovementKey(nChar) || HandleTurretKey(nChar);
 
   normalizeDirection(tank.turret.direction);
   normalizeDirection(tank.hullDirection);
