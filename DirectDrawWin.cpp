@@ -644,7 +644,7 @@ LPDIRECTDRAWSURFACE DirectDrawWin::CreateSurface(const std::wstring& filename, b
 		return 0;
 	}
 
-	TRACE("loading '%s': width=%d height=%d depth=%d\n", filename, imagew, imageh, imagebitdepth);
+	TRACE("loading '%ls': width=%d height=%d depth=%d\n", filename.c_str(), imagew, imageh, imagebitdepth);
 
 	if (imagebitdepth==8)
 	{
@@ -935,7 +935,7 @@ BOOL DirectDrawWin::LoadSurface( LPDIRECTDRAWSURFACE surf, LPCTSTR filename)
 		return 0;
 	}
 
-	TRACE("loading '%s': width=%d height=%d depth=%d\n", filename, imagew, imageh, imagebitdepth);
+	TRACE("loading '%ls': width=%d height=%d depth=%d\n", filename, imagew, imageh, imagebitdepth);
 
 	if (imagebitdepth==8)
 	{
