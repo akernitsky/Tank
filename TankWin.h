@@ -7,15 +7,34 @@
 class TankWin : public DirectDrawWin
 {
 public:
+	struct TurretState
+	{
+		int direction = 5;
+	};
+
+	struct ProjectileState
+	{
+		bool isFiring = false;
+		bool isTriggered = false;
+		int activeDirection = 5;
+		int originX = 0;
+		int originY = 0;
+		int lastX = 0;
+		int lastY = 0;
+	};
+
+	struct TankState
+	{
+		int x = 100;
+		int y = 100;
+		int hullDirection = 5;
+		TurretState turret;
+	};
 
 	int animationTick;
 	BOOL isFacingRight;
-	int tankY;
-	int hullDirection;
-	int tankX;
-	int turretDirection;
-	int activeProjectileDirection;
-	int previousProjectileDirection = 0;
+	TankState tank;
+	ProjectileState projectile;
 	TankWin();
 
 protected:
@@ -55,8 +74,6 @@ private:
 	int terrainSurfaceIndex = -1;
 	int projectileSurfaceIndex = -1;
 	int projectileEraserSurfaceIndex = -1;
-	int lastProjectileXPos = 0;
-	int lastProjectileYPos = 0;
 
 	void RestoreSurfaces();
 	LPDIRECTDRAWSURFACE createCustomSurface(const std::wstring& fileName);
