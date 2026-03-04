@@ -6,8 +6,9 @@
 #undef THIS_FILE
 static char BASED_CODE THIS_FILE[] = __FILE__;
 #endif
-extern bool bOgon;
-extern bool bPul;
+
+bool bOgon = false;
+bool bPul = false;
 extern bool bVzr;
 int timer=0;
 int timer1=0;

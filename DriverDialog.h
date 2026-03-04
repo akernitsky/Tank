@@ -1,6 +1,9 @@
 // DriverDialog.h : header file
 //
 
+#include "Headers.h"
+#include "resource.h"
+
 /////////////////////////////////////////////////////////////////////////////
 // DriverDialog dialog
 
