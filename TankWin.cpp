@@ -238,7 +238,7 @@ void TankWin::drawProjectileInPosition(int xPos, int yPos)
 
 void TankWin::drawExplosion(int xPos, int yPos)
 {
-	if (bVzr && timer < 2280)
+	if (bVzr && timer >= 1200 && timer < 2280)
 	{
 		BltSurface(backsurf, surfaces[73 + (timer - 1200) / 40].get(), xPos, yPos, TRUE);
 	}
@@ -357,7 +357,7 @@ void TankWin::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 		}
 		break;
 	case VK_RETURN:
-		if (!bOgon)
+		if (!bOgon && !bVzr)
 		{
 			timer = 1;
 			bOgon = true;
