@@ -25,8 +25,10 @@ const int kTankHullSpriteYOffset = 45;
 const int kTankTurretSpriteYOffset = 42;
 const int kTurretSpriteIndexOffset = 16;
 const int kDirectionToIndexOffset = 1;
-const int kProjectileSpriteHalfWidth = 37;
-const int kProjectileExplosionOffset = 37;
+const int kProjectileSpriteHalfWidth = 1;
+const int kProjectileSpriteHalfHeight = 1;
+const int kExplosionSpriteHalfWidth = 60;
+const int kExplosionSpriteHalfHeight = 40;
 const int kExplosionStartTime = 1200;
 const int kExplosionEndTime = 2280;
 const int kExplosionFrameDuration = 40;
@@ -254,20 +256,16 @@ calculateProjectileDistanceInCoordinates(int turretPosition, int time) {
   const double angle =
       (turretPosition - kDirectionToIndexOffset) * 2 * M_PI / kDirectionCount -
       M_PI / kAngleQuarterTurnDivisor;
-  auto xExtent = std::cos(angle) * time / kProjectileSpeedDivisor;
-  auto yExtent = std::sin(angle) * time / kProjectileSpeedDivisor;
-
-  double ratio = static_cast<double>(kTankHeight) / kTankWidth;
-
-  xExtent /= ratio;
-  yExtent *= ratio;
+  const auto xExtent = std::cos(angle) * time / kProjectileSpeedDivisor;
+  const auto yExtent = std::sin(angle) * time / kProjectileSpeedDivisor;
 
   return std::make_pair(static_cast<int>(xExtent), static_cast<int>(yExtent));
 }
 
 void TankWin::drawProjectileInPosition(int xPos, int yPos) {
-  BltSurface(backsurf, getProjectileSurface(), xPos - kProjectileSpriteHalfWidth, yPos,
-             TRUE);
+  BltSurface(backsurf, getProjectileSurface(),
+             xPos - kProjectileSpriteHalfWidth,
+             yPos - kProjectileSpriteHalfHeight, TRUE);
 }
 
 void TankWin::drawExplosion(int xPos, int yPos) {
@@ -303,8 +301,8 @@ void TankWin::drawProjectile() {
     projectile.lastX = projectileXPos;
     projectile.lastY = projectileYPos;
   }
-  drawExplosion(projectile.lastX - kProjectileExplosionOffset,
-                projectile.lastY - kProjectileExplosionOffset);
+  drawExplosion(projectile.lastX - kExplosionSpriteHalfWidth,
+                projectile.lastY - kExplosionSpriteHalfHeight);
 }
 
 void TankWin::DrawScene() {
