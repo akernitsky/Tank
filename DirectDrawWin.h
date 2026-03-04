@@ -1,6 +1,7 @@
 #ifndef DIRECTDRAWWIN_H
 #define DIRECTDRAWWIN_H
 
+#include "Headers.h"
 
 const int MAXDRIVERS = 10;
 const int MAXDISPLAYMODES = 100;
@@ -55,7 +56,7 @@ public:
 	BOOL GetSurfaceRect( LPDIRECTDRAWSURFACE surf, RECT& rect);
 	virtual void RestoreSurfaces() = 0;
 	BOOL BltSurface( LPDIRECTDRAWSURFACE destsurf, LPDIRECTDRAWSURFACE srcsurf, int x, int y, BOOL srccolorkey=FALSE );
-	DWORD RGBtoPixel(DWORD r, DWORD g, DWORD b);	
+	DWORD RGBtoPixel(DWORD r, DWORD g, DWORD b); 	
 	void PrintSurfaceInfo(LPDIRECTDRAWSURFACE surf, LPCTSTR name);
 
 	//------- misc functions ---------
