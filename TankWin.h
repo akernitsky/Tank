@@ -5,14 +5,17 @@
 
 class TankWin : public DirectDrawWin {
 public:
+  static constexpr int kDefaultDirection = 5;
+  static constexpr int kDefaultTankPosition = 100;
+
   struct TurretState {
-    int direction = 5;
+    int direction = kDefaultDirection;
   };
 
   struct ProjectileState {
     bool isFiring = false;
     bool isTriggered = false;
-    int activeDirection = 5;
+    int activeDirection = kDefaultDirection;
     int originX = 0;
     int originY = 0;
     int lastX = 0;
@@ -20,9 +23,9 @@ public:
   };
 
   struct TankState {
-    int x = 100;
-    int y = 100;
-    int hullDirection = 5;
+    int x = kDefaultTankPosition;
+    int y = kDefaultTankPosition;
+    int hullDirection = kDefaultDirection;
     TurretState turret;
   };
 

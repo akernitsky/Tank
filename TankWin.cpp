@@ -19,6 +19,47 @@ namespace {
 const int kMinDirection = 1;
 const int kMaxDirection = 16;
 const int kDirectionCount = 16;
+const int kAnimationTickMs = 500;
+const int kTankSpriteXOffset = 20;
+const int kTankHullSpriteYOffset = 45;
+const int kTankTurretSpriteYOffset = 42;
+const int kTurretSpriteIndexOffset = 16;
+const int kDirectionToIndexOffset = 1;
+const int kProjectileSpriteHalfWidth = 37;
+const int kProjectileExplosionOffset = 37;
+const int kExplosionStartTime = 1200;
+const int kExplosionEndTime = 2280;
+const int kExplosionFrameDuration = 40;
+const int kExplosionSurfaceStartIndex = 73;
+const int kProjectileLaunchTimerThreshold = 10;
+const int kProjectileOriginXOffset = 105;
+const int kProjectileOriginYOffset = 76;
+const int kProjectileTimerDivisor = 3;
+const int kTankWidth = 74;
+const int kTankHeight = 54;
+const int kAngleQuarterTurnDivisor = 2;
+const int kProjectileSpeedDivisor = 2;
+const int kUppercaseFileNameStart = 18;
+const int kExplosionStartFrame = 101;
+const int kExplosionEndFrame = 132;
+const int kSingleDriverIndex = 1;
+const int kDefaultDisplayModeIndex = 0;
+const int kColorKeyValue = 0;
+const int kDisplayModeSetFlags = 0;
+const int kShiftCloseCode = -1;
+const int kInitialFireTimer = 1;
+const int kDirectionRight = 5;
+const int kDirectionLeft = 13;
+const int kDirectionUp = 1;
+const int kDirectionDown = 9;
+const int kRightMinTurn = 6;
+const int kRightMaxTurn = 13;
+const int kLeftMinTurn = 5;
+const int kLeftMaxTurn = 12;
+const int kUpMinTurn = 2;
+const int kUpMaxTurn = 9;
+const int kDownMinTurn = 10;
+const int kDownMaxTurn = 16;
 
 void normalizeDirection(int &direction) {
   while (direction > kMaxDirection) {
@@ -39,7 +80,7 @@ END_MESSAGE_MAP()
 
 TankWin::TankWin() {
   isFacingRight = FALSE;
-  animationTick = 500;
+  animationTick = kAnimationTickMs;
 
   projectile.isFiring = false;
 }
@@ -47,7 +88,7 @@ TankWin::TankWin() {
 LPDIRECTDRAWSURFACE TankWin::createCustomSurface(const std::wstring &fileName) {
   LPDIRECTDRAWSURFACE surf = CreateSurface(fileName);
 
-  if (surf == 0) {
+  if (surf == nullptr) {
     const std::wstring errorText = std::wstring(L"failed to load: " + fileName);
     Fatal(errorText.c_str());
   }
@@ -58,8 +99,8 @@ void TankWin::addToSurfaces(IDirectDrawSurface *surface) {
 
   if (surface != nullptr) {
     DDCOLORKEY colorkey;
-    colorkey.dwColorSpaceLowValue = 0;
-    colorkey.dwColorSpaceHighValue = 0;
+    colorkey.dwColorSpaceLowValue = kColorKeyValue;
+    colorkey.dwColorSpaceHighValue = kColorKeyValue;
     surface->SetColorKey(DDCKEY_SRCBLT, &colorkey);
 
     surfaces.push_back(std::shared_ptr<IDirectDrawSurface>(
@@ -117,7 +158,7 @@ void TankWin::createSurfaces() {
   const int upperCaseOffset = static_cast<int>(fileNameMapping.size());
   for (size_t i = 0; i < staticSurfaceFiles.size() - 1; ++i) {
     std::wstring name = staticSurfaceFiles[i];
-    if (i >= 18) {
+    if (i >= kUppercaseFileNameStart) {
       for (auto &ch : name) {
         if (ch >= L'a' && ch <= L'z') {
           ch = ch - L'a' + L'A';
@@ -128,8 +169,9 @@ void TankWin::createSurfaces() {
   }
 
   const int explosionOffset = static_cast<int>(fileNameMapping.size());
-  for (int i = 101; i <= 132; ++i) {
-    fileNameMapping[explosionOffset + i - 101] = std::to_wstring(i) + L".bmp";
+  for (int i = kExplosionStartFrame; i <= kExplosionEndFrame; ++i) {
+    fileNameMapping[explosionOffset + i - kExplosionStartFrame] =
+        std::to_wstring(i) + L".bmp";
   }
 
   for (const auto &element : fileNameMapping) {
@@ -182,37 +224,40 @@ void TankWin::drawTank() {
 }
 
 void TankWin::drawTankHull() {
-  BltSurface(backsurf, surfaces[tank.hullDirection - 1].get(), 20 + tank.x,
-             45 + tank.y, TRUE);
+  BltSurface(backsurf, surfaces[tank.hullDirection - kDirectionToIndexOffset].get(),
+             kTankSpriteXOffset + tank.x, kTankHullSpriteYOffset + tank.y, TRUE);
 }
 
 void TankWin::drawTankTurret() {
-  BltSurface(backsurf, surfaces[tank.turret.direction + 16 - 1].get(),
-             20 + tank.x, 42 + tank.y, TRUE);
+  BltSurface(backsurf,
+             surfaces[tank.turret.direction + kTurretSpriteIndexOffset -
+                      kDirectionToIndexOffset]
+                 .get(),
+             kTankSpriteXOffset + tank.x, kTankTurretSpriteYOffset + tank.y,
+             TRUE);
 }
 
 std::pair<int, int> TankWin::calculateCanonsTip(int turretPosition) {
   const int xCenter = projectile.originX;
   const int yCenter = projectile.originY;
-  const int height = 54;
-  const int width = 74;
-
-  const double angle = (turretPosition - 1) * 2 * M_PI / 16 - M_PI / 2;
+  const double angle =
+      (turretPosition - kDirectionToIndexOffset) * 2 * M_PI / kDirectionCount -
+      M_PI / kAngleQuarterTurnDivisor;
 
   return std::make_pair(
-      static_cast<int>(xCenter + std::cos(angle) * width / 2),
-      static_cast<int>(yCenter + std::sin(angle) * height / 2));
+      static_cast<int>(xCenter + std::cos(angle) * kTankWidth / kProjectileSpeedDivisor),
+      static_cast<int>(yCenter + std::sin(angle) * kTankHeight / kProjectileSpeedDivisor));
 }
 
 static std::pair<int, int>
 calculateProjectileDistanceInCoordinates(int turretPosition, int time) {
-  const double angle = (turretPosition - 1) * 2 * M_PI / 16 - M_PI / 2;
-  auto xExtent = std::cos(angle) * time / 2;
-  auto yExtent = std::sin(angle) * time / 2;
+  const double angle =
+      (turretPosition - kDirectionToIndexOffset) * 2 * M_PI / kDirectionCount -
+      M_PI / kAngleQuarterTurnDivisor;
+  auto xExtent = std::cos(angle) * time / kProjectileSpeedDivisor;
+  auto yExtent = std::sin(angle) * time / kProjectileSpeedDivisor;
 
-  const int height = 54;
-  const int width = 74;
-  double ratio = static_cast<double>(height) / width;
+  double ratio = static_cast<double>(kTankHeight) / kTankWidth;
 
   xExtent /= ratio;
   yExtent *= ratio;
@@ -221,12 +266,17 @@ calculateProjectileDistanceInCoordinates(int turretPosition, int time) {
 }
 
 void TankWin::drawProjectileInPosition(int xPos, int yPos) {
-  BltSurface(backsurf, getProjectileSurface(), xPos - 37, yPos, TRUE);
+  BltSurface(backsurf, getProjectileSurface(), xPos - kProjectileSpriteHalfWidth, yPos,
+             TRUE);
 }
 
 void TankWin::drawExplosion(int xPos, int yPos) {
-  if (bVzr && timer >= 1200 && timer < 2280) {
-    BltSurface(backsurf, surfaces[73 + (timer - 1200) / 40].get(), xPos, yPos,
+  if (bVzr && timer >= kExplosionStartTime && timer < kExplosionEndTime) {
+    BltSurface(backsurf,
+               surfaces[kExplosionSurfaceStartIndex +
+                        (timer - kExplosionStartTime) / kExplosionFrameDuration]
+                   .get(),
+               xPos, yPos,
                TRUE);
   }
 }
@@ -237,14 +287,14 @@ void TankWin::drawProjectile() {
   }
 
   if (projectile.isFiring) {
-    if (timer <= 10) {
-      projectile.originX = 105 + tank.x;
-      projectile.originY = 76 + tank.y;
+    if (timer <= kProjectileLaunchTimerThreshold) {
+      projectile.originX = kProjectileOriginXOffset + tank.x;
+      projectile.originY = kProjectileOriginYOffset + tank.y;
       projectile.activeDirection = tank.turret.direction;
     }
     const auto canonsTip = calculateCanonsTip(projectile.activeDirection);
     const auto extent = calculateProjectileDistanceInCoordinates(
-        projectile.activeDirection, timer / 3);
+        projectile.activeDirection, timer / kProjectileTimerDivisor);
 
     const int projectileXPos = canonsTip.first + extent.first;
     const int projectileYPos = canonsTip.second + extent.second;
@@ -253,7 +303,8 @@ void TankWin::drawProjectile() {
     projectile.lastX = projectileXPos;
     projectile.lastY = projectileYPos;
   }
-  drawExplosion(projectile.lastX - 37, projectile.lastY - 37);
+  drawExplosion(projectile.lastX - kProjectileExplosionOffset,
+                projectile.lastY - kProjectileExplosionOffset);
 }
 
 void TankWin::DrawScene() {
@@ -285,8 +336,8 @@ void TankWin::RestoreSurfaces() {
 
 int TankWin::SelectDriver() {
   int numdrivers = GetNumDrivers();
-  if (numdrivers == 1)
-    return 0;
+  if (numdrivers == kSingleDriverIndex)
+    return kDefaultDisplayModeIndex;
 
   CArray<CString, CString> drivers;
   for (int i = 0; i < numdrivers; i++) {
@@ -298,7 +349,7 @@ int TankWin::SelectDriver() {
   DriverDialog dialog;
   dialog.SetContents(&drivers);
   if (dialog.DoModal() != IDOK)
-    return -1;
+    return kShiftCloseCode;
 
   return dialog.GetSelection();
 }
@@ -309,7 +360,8 @@ int TankWin::SelectInitialDisplayMode() {
   DWORD wd, h, d;
 
   if (curdepth != desireddepth)
-    ddraw2->SetDisplayMode(2880, 1800, curdepth, 0, 0);
+    ddraw2->SetDisplayMode(desiredwidth, desiredheight, curdepth,
+                           kDisplayModeSetFlags, kDisplayModeSetFlags);
 
   for (i = 0; i < nummodes; i++) {
     GetDisplayModeDimensions(i, wd, h, d);
@@ -323,7 +375,7 @@ int TankWin::SelectInitialDisplayMode() {
       return i;
   }
 
-  return 0;
+  return kDefaultDisplayModeIndex;
 }
 
 void TankWin::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags) {
@@ -335,7 +387,7 @@ void TankWin::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags) {
     break;
   case VK_RETURN:
     if (!projectile.isFiring && !bVzr) {
-      timer = 1;
+      timer = kInitialFireTimer;
       projectile.isFiring = true;
     }
     break;
@@ -348,44 +400,55 @@ void TankWin::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags) {
     break;
   case VK_RIGHT:
     projectile.isFiring = false;
-    if (tank.hullDirection == 5) {
+    if (tank.hullDirection == kDirectionRight) {
       ++tank.x;
     } else {
       const int directionDelta =
-          (tank.hullDirection >= 6 && tank.hullDirection <= 13) ? -1 : 1;
+          (tank.hullDirection >= kRightMinTurn &&
+           tank.hullDirection <= kRightMaxTurn)
+              ? -kDirectionToIndexOffset
+              : kDirectionToIndexOffset;
       tank.hullDirection += directionDelta;
       tank.turret.direction += directionDelta;
     }
     break;
   case VK_LEFT:
     projectile.isFiring = false;
-    if (tank.hullDirection == 13) {
+    if (tank.hullDirection == kDirectionLeft) {
       --tank.x;
     } else {
       const int directionDelta =
-          (tank.hullDirection >= 5 && tank.hullDirection <= 12) ? 1 : -1;
+          (tank.hullDirection >= kLeftMinTurn &&
+           tank.hullDirection <= kLeftMaxTurn)
+              ? kDirectionToIndexOffset
+              : -kDirectionToIndexOffset;
       tank.hullDirection += directionDelta;
       tank.turret.direction += directionDelta;
     }
     break;
   case VK_UP:
     projectile.isFiring = false;
-    if (tank.hullDirection == 1) {
+    if (tank.hullDirection == kDirectionUp) {
       --tank.y;
     } else {
       const int directionDelta =
-          (tank.hullDirection >= 2 && tank.hullDirection <= 9) ? -1 : 1;
+          (tank.hullDirection >= kUpMinTurn && tank.hullDirection <= kUpMaxTurn)
+              ? -kDirectionToIndexOffset
+              : kDirectionToIndexOffset;
       tank.hullDirection += directionDelta;
       tank.turret.direction += directionDelta;
     }
     break;
   case VK_DOWN:
     projectile.isFiring = false;
-    if (tank.hullDirection == 9) {
+    if (tank.hullDirection == kDirectionDown) {
       ++tank.y;
     } else {
       const int directionDelta =
-          (tank.hullDirection >= 10 && tank.hullDirection <= 16) ? -1 : 1;
+          (tank.hullDirection >= kDownMinTurn &&
+           tank.hullDirection <= kDownMaxTurn)
+              ? -kDirectionToIndexOffset
+              : kDirectionToIndexOffset;
       tank.hullDirection += directionDelta;
       tank.turret.direction += directionDelta;
     }
