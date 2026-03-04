@@ -12,17 +12,11 @@
 extern int timer;
 extern int timer1;
 
-bool bOgon = false;
 bool bVzr = false;
-bool bPul = false;
 
 const DWORD desiredwidth = 2880;
 const DWORD desiredheight = 1800;
 const DWORD desireddepth = 32;
-
-int projectileOriginX = 0;
-int projectileOriginY = 0;
-
 
 
 namespace
@@ -58,11 +52,7 @@ TankWin::TankWin()
 	animationTick = 500;
 
 
-	tankX = 100;
-	tankY = 100;
-	hullDirection = 5;
-	turretDirection = 5;
-	bOgon = false;
+	projectile.isFiring = false;
 }
 
 LPDIRECTDRAWSURFACE TankWin::createCustomSurface(const std::wstring& fileName)
@@ -192,18 +182,18 @@ void TankWin::drawTank()
 
 void TankWin::drawTankHull()
 {
-	BltSurface(backsurf, surfaces[hullDirection - 1].get(), 20 + tankX, 45 + tankY, TRUE);
+	BltSurface(backsurf, surfaces[tank.hullDirection - 1].get(), 20 + tank.x, 45 + tank.y, TRUE);
 }
 
 void TankWin::drawTankTurret()
 {
-	BltSurface(backsurf, surfaces[turretDirection + 16 - 1].get(), 20 + tankX, 42 + tankY, TRUE);
+	BltSurface(backsurf, surfaces[tank.turret.direction + 16 - 1].get(), 20 + tank.x, 42 + tank.y, TRUE);
 }
 
 std::pair<int, int> TankWin::calculateCanonsTip(int turretPosition)
 {
-	const int xCenter = projectileOriginX;
-	const int yCenter = projectileOriginY;
+	const int xCenter = projectile.originX;
+	const int yCenter = projectile.originY;
 	const int height = 54;
 	const int width = 74;
 
@@ -243,25 +233,25 @@ void TankWin::drawExplosion(int xPos, int yPos)
 
 void TankWin::drawProjectile()
 {
-	if (bOgon)
+	if (projectile.isFiring)
 	{
 		if (timer <= 10)
 		{
-			projectileOriginX = 105 + tankX;
-			projectileOriginY = 76 + tankY;
-			activeProjectileDirection = turretDirection;
+			projectile.originX = 105 + tank.x;
+			projectile.originY = 76 + tank.y;
+			projectile.activeDirection = tank.turret.direction;
 		}
-		const auto canonsTip = calculateCanonsTip(activeProjectileDirection);
-		const auto extent = calculateProjectileDistanceInCoordinates(activeProjectileDirection, timer / 3);
+		const auto canonsTip = calculateCanonsTip(projectile.activeDirection);
+		const auto extent = calculateProjectileDistanceInCoordinates(projectile.activeDirection, timer / 3);
 
 		const int projectileXPos = canonsTip.first + extent.first;
 		const int projectileYPos = canonsTip.second + extent.second;
 		drawProjectileInPosition(projectileXPos, projectileYPos);
 
-		lastProjectileXPos = projectileXPos;
-		lastProjectileYPos = projectileYPos;
+		projectile.lastX = projectileXPos;
+		projectile.lastY = projectileYPos;
 	}
-	drawExplosion(lastProjectileXPos - 37, lastProjectileYPos - 37);
+	drawExplosion(projectile.lastX - 37, projectile.lastY - 37);
 }
 
 void TankWin::DrawScene()
@@ -348,90 +338,90 @@ void TankWin::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 	switch (nChar)
 	{
 	case VK_SHIFT:
-		if (!bPul)
+		if (!projectile.isTriggered)
 		{
-			bPul = true;
+			projectile.isTriggered = true;
 		}
 		break;
 	case VK_RETURN:
-		if (!bOgon && !bVzr)
+		if (!projectile.isFiring && !bVzr)
 		{
 			timer = 1;
-			bOgon = true;
+			projectile.isFiring = true;
 		}
 		break;
 	case VK_ESCAPE:
 		PostMessage(WM_CLOSE);
 		break;
 	case VK_SPACE:
-		++hullDirection;
-		++turretDirection;
+		++tank.hullDirection;
+		++tank.turret.direction;
 		break;
 	case VK_RIGHT:
-		bOgon = false;
-		if (hullDirection == 5)
+		projectile.isFiring = false;
+		if (tank.hullDirection == 5)
 		{
-			++tankX;
+			++tank.x;
 		}
 		else
 		{
-			const int directionDelta = (hullDirection >= 6 && hullDirection <= 13) ? -1 : 1;
-			hullDirection += directionDelta;
-			turretDirection += directionDelta;
+			const int directionDelta = (tank.hullDirection >= 6 && tank.hullDirection <= 13) ? -1 : 1;
+			tank.hullDirection += directionDelta;
+			tank.turret.direction += directionDelta;
 		}
 		break;
 	case VK_LEFT:
-		bOgon = false;
-		if (hullDirection == 13)
+		projectile.isFiring = false;
+		if (tank.hullDirection == 13)
 		{
-			--tankX;
+			--tank.x;
 		}
 		else
 		{
-			const int directionDelta = (hullDirection >= 5 && hullDirection <= 12) ? 1 : -1;
-			hullDirection += directionDelta;
-			turretDirection += directionDelta;
+			const int directionDelta = (tank.hullDirection >= 5 && tank.hullDirection <= 12) ? 1 : -1;
+			tank.hullDirection += directionDelta;
+			tank.turret.direction += directionDelta;
 		}
 		break;
 	case VK_UP:
-		bOgon = false;
-		if (hullDirection == 1)
+		projectile.isFiring = false;
+		if (tank.hullDirection == 1)
 		{
-			--tankY;
+			--tank.y;
 		}
 		else
 		{
-			const int directionDelta = (hullDirection >= 2 && hullDirection <= 9) ? -1 : 1;
-			hullDirection += directionDelta;
-			turretDirection += directionDelta;
+			const int directionDelta = (tank.hullDirection >= 2 && tank.hullDirection <= 9) ? -1 : 1;
+			tank.hullDirection += directionDelta;
+			tank.turret.direction += directionDelta;
 		}
 		break;
 	case VK_DOWN:
-		bOgon = false;
-		if (hullDirection == 9)
+		projectile.isFiring = false;
+		if (tank.hullDirection == 9)
 		{
-			++tankY;
+			++tank.y;
 		}
 		else
 		{
-			const int directionDelta = (hullDirection >= 10 && hullDirection <= 16) ? -1 : 1;
-			hullDirection += directionDelta;
-			turretDirection += directionDelta;
+			const int directionDelta = (tank.hullDirection >= 10 && tank.hullDirection <= 16) ? -1 : 1;
+			tank.hullDirection += directionDelta;
+			tank.turret.direction += directionDelta;
 		}
 		break;
 	case VK_END:
-		bOgon = false;
-		++turretDirection;
+		projectile.isFiring = false;
+		++tank.turret.direction;
 		break;
 	case VK_HOME:
-		bOgon = false;
-		--turretDirection;
+		projectile.isFiring = false;
+		--tank.turret.direction;
 		break;
 	default:
 		break;
 	}
 
-	normalizeDirection(turretDirection);
-	normalizeDirection(hullDirection);
+	normalizeDirection(tank.turret.direction);
+	normalizeDirection(tank.hullDirection);
 	DirectDrawWin::OnKeyDown(nChar, nRepCnt, nFlags);
 }
