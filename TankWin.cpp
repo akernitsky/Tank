@@ -311,9 +311,6 @@ void TankWin::DrawScene() {
   ClearSurface(backsurf, 0);
   CRect client;
   GetClientRect(client);
-  const int width = client.Width();
-  const int height = client.Height();
-
   drawSurface();
   drawTank();
 
