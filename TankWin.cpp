@@ -8,7 +8,6 @@
 #pragma comment(lib, "dxguid.lib")
 
 extern int timer;
-extern int timer1;
 
 bool bVzr = false;
 
@@ -233,6 +232,10 @@ void TankWin::drawExplosion(int xPos, int yPos) {
 }
 
 void TankWin::drawProjectile() {
+  if (bVzr) {
+    projectile.isFiring = false;
+  }
+
   if (projectile.isFiring) {
     if (timer <= 10) {
       projectile.originX = 105 + tank.x;
