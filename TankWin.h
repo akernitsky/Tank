@@ -52,6 +52,9 @@ private:
 	std::wstring pathname;
 	std::vector<std::shared_ptr<IDirectDrawSurface>> surfaces;
 	std::map<int, std::wstring> fileNameMapping;
+	int terrainSurfaceIndex = -1;
+	int projectileSurfaceIndex = -1;
+	int projectileEraserSurfaceIndex = -1;
 	int lastProjectileXPos = 0;
 	int lastProjectileYPos = 0;
 
