@@ -104,6 +104,9 @@ void TankWin::createSurfaces()
 	};
 
 	fileNameMapping.clear();
+	terrainSurfaceIndex = -1;
+	projectileSurfaceIndex = -1;
+	projectileEraserSurfaceIndex = -1;
 	for (size_t i = 0; i < staticSurfaceFiles.size(); ++i)
 	{
 		fileNameMapping[static_cast<int>(i)] = staticSurfaceFiles[i];
@@ -136,6 +139,19 @@ void TankWin::createSurfaces()
 	{
 		IDirectDrawSurface* surface = createCustomSurface(element.second);
 		addToSurfaces(surface);
+
+		if (element.second == L"ter.bmp")
+		{
+			terrainSurfaceIndex = static_cast<int>(surfaces.size()) - 1;
+		}
+		else if (element.second == L"point.bmp")
+		{
+			projectileSurfaceIndex = static_cast<int>(surfaces.size()) - 1;
+		}
+		else if (element.second == L"er.bmp")
+		{
+			projectileEraserSurfaceIndex = static_cast<int>(surfaces.size()) - 1;
+		}
 	}
 }
 
@@ -150,17 +166,20 @@ BOOL TankWin::CreateCustomSurfaces()
 
 IDirectDrawSurface* TankWin::getTerrainSurface()
 {
-	return surfaces[32].get();
+	assert(terrainSurfaceIndex >= 0 && terrainSurfaceIndex < static_cast<int>(surfaces.size()));
+	return surfaces[terrainSurfaceIndex].get();
 }
 
 IDirectDrawSurface* TankWin::getProjectileSurface()
 {
-	return surfaces[35].get();
+	assert(projectileSurfaceIndex >= 0 && projectileSurfaceIndex < static_cast<int>(surfaces.size()));
+	return surfaces[projectileSurfaceIndex].get();
 }
 
 IDirectDrawSurface* TankWin::getProjectileSurfaceEraser()
 {
-	return surfaces[36].get();
+	assert(projectileEraserSurfaceIndex >= 0 && projectileEraserSurfaceIndex < static_cast<int>(surfaces.size()));
+	return surfaces[projectileEraserSurfaceIndex].get();
 }
 
 void TankWin::drawSurface()
@@ -214,7 +233,7 @@ static std::pair<int, int> calculateProjectileDistanceInCoordinates(int turretPo
 
 void TankWin::drawProjectileInPosition(int xPos, int yPos)
 {
-	BltSurface(backsurf, getProjectileSurface(), xPos - 37, yPos, FALSE);
+	BltSurface(backsurf, getProjectileSurface(), xPos - 37, yPos, TRUE);
 }
 
 void TankWin::drawExplosion(int xPos, int yPos)
