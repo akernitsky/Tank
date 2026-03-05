@@ -37,8 +37,7 @@ const int kProjectileLaunchTimerThreshold = 10;
 const int kProjectileOriginXOffset = 105;
 const int kProjectileOriginYOffset = 76;
 const int kProjectileTimerDivisor = 3;
-const int kTankWidth = 74;
-const int kTankHeight = 54;
+const int kCannonTipDistance = 34;
 const int kAngleQuarterTurnDivisor = 2;
 const int kProjectileSpeedDivisor = 2;
 const int kUppercaseFileNameStart = 18;
@@ -70,6 +69,10 @@ void normalizeDirection(int &direction) {
   while (direction < kMinDirection) {
     direction += kDirectionCount;
   }
+}
+
+int roundToInt(double value) {
+  return static_cast<int>(::lround(value));
 }
 } // namespace
 
@@ -247,8 +250,8 @@ std::pair<int, int> TankWin::calculateCanonsTip(int turretPosition) {
       M_PI / kAngleQuarterTurnDivisor;
 
   return std::make_pair(
-      static_cast<int>(xCenter + std::cos(angle) * kTankWidth / kProjectileSpeedDivisor),
-      static_cast<int>(yCenter + std::sin(angle) * kTankHeight / kProjectileSpeedDivisor));
+      roundToInt(xCenter + std::cos(angle) * kCannonTipDistance),
+      roundToInt(yCenter + std::sin(angle) * kCannonTipDistance));
 }
 
 static std::pair<int, int>
@@ -259,7 +262,7 @@ calculateProjectileDistanceInCoordinates(int turretPosition, int time) {
   const auto xExtent = std::cos(angle) * time / kProjectileSpeedDivisor;
   const auto yExtent = std::sin(angle) * time / kProjectileSpeedDivisor;
 
-  return std::make_pair(static_cast<int>(xExtent), static_cast<int>(yExtent));
+  return std::make_pair(roundToInt(xExtent), roundToInt(yExtent));
 }
 
 void TankWin::drawProjectileInPosition(int xPos, int yPos) {
