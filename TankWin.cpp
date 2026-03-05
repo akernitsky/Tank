@@ -400,6 +400,9 @@ bool TankWin::HandleFireKeys(UINT nChar) {
   case VK_RETURN:
     if (!projectile.isFiring && !bVzr) {
       timer = kInitialFireTimer;
+      projectile.originX = kProjectileOriginXOffset + tank.x;
+      projectile.originY = kProjectileOriginYOffset + tank.y;
+      projectile.activeDirection = tank.turret.direction;
       projectile.isFiring = true;
     }
     return true;
@@ -454,6 +457,7 @@ bool TankWin::HandleHullMovementKey(UINT nChar) {
     }
     return true;
   case VK_SPACE:
+    projectile.isFiring = false;
     ++tank.hullDirection;
     ++tank.turret.direction;
     return true;
