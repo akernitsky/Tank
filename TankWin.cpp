@@ -275,7 +275,8 @@ void TankWin::drawDebugLineBetweenPoints(int startX, int startY, int endX,
                                          int endY) {
   const int deltaX = endX - startX;
   const int deltaY = endY - startY;
-  const int steps = std::max(std::abs(deltaX), std::abs(deltaY));
+
+  const int steps = (std::max)(std::abs(deltaX), std::abs(deltaY));
 
   if (steps == 0) {
     drawProjectileInPosition(startX, startY);
