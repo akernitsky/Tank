@@ -271,6 +271,25 @@ void TankWin::drawProjectileInPosition(int xPos, int yPos) {
              yPos - kProjectileSpriteHalfHeight, TRUE);
 }
 
+void TankWin::drawDebugLineBetweenPoints(int startX, int startY, int endX,
+                                         int endY) {
+  const int deltaX = endX - startX;
+  const int deltaY = endY - startY;
+  const int steps = std::max(std::abs(deltaX), std::abs(deltaY));
+
+  if (steps == 0) {
+    drawProjectileInPosition(startX, startY);
+    return;
+  }
+
+  for (int i = 0; i <= steps; ++i) {
+    const double t = static_cast<double>(i) / static_cast<double>(steps);
+    const int x = roundToInt(startX + deltaX * t);
+    const int y = roundToInt(startY + deltaY * t);
+    drawProjectileInPosition(x, y);
+  }
+}
+
 void TankWin::drawExplosion(int xPos, int yPos) {
   if (bVzr && timer >= kExplosionStartTime && timer < kExplosionEndTime) {
     BltSurface(backsurf,
@@ -304,6 +323,13 @@ void TankWin::drawProjectile() {
     projectile.lastX = projectileXPos;
     projectile.lastY = projectileYPos;
   }
+
+  if (bVzr) {
+    const auto canonsTip = calculateCanonsTip(projectile.activeDirection);
+    drawDebugLineBetweenPoints(canonsTip.first, canonsTip.second,
+                               projectile.lastX, projectile.lastY);
+  }
+
   drawExplosion(projectile.lastX - kExplosionSpriteHalfWidth,
                 projectile.lastY - kExplosionSpriteHalfHeight);
 }
