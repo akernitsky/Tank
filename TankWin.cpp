@@ -37,8 +37,7 @@ const int kProjectileLaunchTimerThreshold = 10;
 const int kProjectileOriginXOffset = 105;
 const int kProjectileOriginYOffset = 76;
 const int kProjectileTimerDivisor = 3;
-const int kTankWidth = 74;
-const int kTankHeight = 54;
+const int kCannonTipDistance = 34;
 const int kAngleQuarterTurnDivisor = 2;
 const int kProjectileSpeedDivisor = 2;
 const int kUppercaseFileNameStart = 18;
@@ -70,6 +69,10 @@ void normalizeDirection(int &direction) {
   while (direction < kMinDirection) {
     direction += kDirectionCount;
   }
+}
+
+int roundToInt(double value) {
+  return static_cast<int>(::lround(value));
 }
 } // namespace
 
@@ -247,8 +250,8 @@ std::pair<int, int> TankWin::calculateCanonsTip(int turretPosition) {
       M_PI / kAngleQuarterTurnDivisor;
 
   return std::make_pair(
-      static_cast<int>(xCenter + std::cos(angle) * kTankWidth / kProjectileSpeedDivisor),
-      static_cast<int>(yCenter + std::sin(angle) * kTankHeight / kProjectileSpeedDivisor));
+      roundToInt(xCenter + std::cos(angle) * kCannonTipDistance),
+      roundToInt(yCenter + std::sin(angle) * kCannonTipDistance));
 }
 
 static std::pair<int, int>
@@ -259,13 +262,32 @@ calculateProjectileDistanceInCoordinates(int turretPosition, int time) {
   const auto xExtent = std::cos(angle) * time / kProjectileSpeedDivisor;
   const auto yExtent = std::sin(angle) * time / kProjectileSpeedDivisor;
 
-  return std::make_pair(static_cast<int>(xExtent), static_cast<int>(yExtent));
+  return std::make_pair(roundToInt(xExtent), roundToInt(yExtent));
 }
 
 void TankWin::drawProjectileInPosition(int xPos, int yPos) {
   BltSurface(backsurf, getProjectileSurface(),
              xPos - kProjectileSpriteHalfWidth,
              yPos - kProjectileSpriteHalfHeight, TRUE);
+}
+
+void TankWin::drawDebugLineBetweenPoints(int startX, int startY, int endX,
+                                         int endY) {
+  const int deltaX = endX - startX;
+  const int deltaY = endY - startY;
+  const int steps = (std::max)(std::abs(deltaX), std::abs(deltaY));
+
+  if (steps == 0) {
+    drawProjectileInPosition(startX, startY);
+    return;
+  }
+
+  for (int i = 0; i <= steps; ++i) {
+    const double t = static_cast<double>(i) / static_cast<double>(steps);
+    const int x = roundToInt(startX + deltaX * t);
+    const int y = roundToInt(startY + deltaY * t);
+    drawProjectileInPosition(x, y);
+  }
 }
 
 void TankWin::drawExplosion(int xPos, int yPos) {
@@ -301,6 +323,17 @@ void TankWin::drawProjectile() {
     projectile.lastX = projectileXPos;
     projectile.lastY = projectileYPos;
   }
+
+  if (bVzr) {
+    projectile.keepDebugLine = true;
+  }
+
+  if (projectile.keepDebugLine) {
+    const auto canonsTip = calculateCanonsTip(projectile.activeDirection);
+    drawDebugLineBetweenPoints(canonsTip.first, canonsTip.second,
+                               projectile.lastX, projectile.lastY);
+  }
+
   drawExplosion(projectile.lastX - kExplosionSpriteHalfWidth,
                 projectile.lastY - kExplosionSpriteHalfHeight);
 }
@@ -400,7 +433,11 @@ bool TankWin::HandleFireKeys(UINT nChar) {
   case VK_RETURN:
     if (!projectile.isFiring && !bVzr) {
       timer = kInitialFireTimer;
+      projectile.originX = kProjectileOriginXOffset + tank.x;
+      projectile.originY = kProjectileOriginYOffset + tank.y;
+      projectile.activeDirection = tank.turret.direction;
       projectile.isFiring = true;
+      projectile.keepDebugLine = false;
     }
     return true;
   default:
@@ -454,6 +491,7 @@ bool TankWin::HandleHullMovementKey(UINT nChar) {
     }
     return true;
   case VK_SPACE:
+    projectile.isFiring = false;
     ++tank.hullDirection;
     ++tank.turret.direction;
     return true;
