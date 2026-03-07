@@ -20,6 +20,7 @@ public:
     int originY = 0;
     int lastX = 0;
     int lastY = 0;
+    bool keepDebugLine = false;
   };
 
   struct TankState {
@@ -68,6 +69,7 @@ private:
   void drawTankTurret();
   std::pair<int, int> calculateCanonsTip(int turretPosition);
   void drawProjectileInPosition(int xPos, int yPos);
+  void drawDebugLineBetweenPoints(int startX, int startY, int endX, int endY);
   void drawProjectile();
   void drawExplosion(int xPos, int yPos);
   IDirectDrawSurface *getProjectileSurfaceEraser();
