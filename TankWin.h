@@ -20,6 +20,7 @@ public:
     int originY = 0;
     int lastX = 0;
     int lastY = 0;
+    bool keepDebugLine = false;
   };
 
   struct TankState {
