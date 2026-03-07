@@ -325,7 +325,11 @@ void TankWin::drawProjectile() {
     projectile.lastY = projectileYPos;
   }
 
-  if (projectile.keepDebugLine) {
+  if (bVzr) {
+    projectile.keepDebugLine = true;
+  }
+
+  if (projectile.isFiring || projectile.keepDebugLine) {
     const auto canonsTip = calculateCanonsTip(projectile.activeDirection);
     drawDebugLineBetweenPoints(canonsTip.first, canonsTip.second,
                                projectile.lastX, projectile.lastY);
@@ -434,7 +438,7 @@ bool TankWin::HandleFireKeys(UINT nChar) {
       projectile.originY = kProjectileOriginYOffset + tank.y;
       projectile.activeDirection = tank.turret.direction;
       projectile.isFiring = true;
-      projectile.keepDebugLine = false;
+      projectile.keepDebugLine = true;
     }
     return true;
   default:
