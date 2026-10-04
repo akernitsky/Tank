@@ -14,7 +14,7 @@ public:
 
   struct ProjectileState {
     bool isFiring = false;
-    bool isTriggered = false;
+    DWORD startedAt = 0;
     int activeDirection = kDefaultDirection;
     int originX = 0;
     int originY = 0;

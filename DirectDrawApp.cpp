@@ -6,14 +6,6 @@
 #undef THIS_FILE
 static char BASED_CODE THIS_FILE[] = __FILE__;
 #endif
-extern bool bVzr;
-int timer=0;
-
-namespace {
-const int kExplosionStartTick = 1200;
-const int kExplosionEndTick = 2280;
-}
-
 BEGIN_MESSAGE_MAP(DirectDrawApp, CWinApp)
 	//{{AFX_MSG_MAP(DirectDrawApp)
 	//}}AFX_MSG_MAP
@@ -37,22 +29,6 @@ BOOL DirectDrawApp::InitInstance()
 
 BOOL DirectDrawApp::OnIdle(LONG) 
 {
-	if (timer > 0)
-	{
-		timer++;
-	}
-
-	if (!bVzr && timer >= kExplosionStartTick)
-	{
-		bVzr = true;
-	}
-
-	if (bVzr && timer >= kExplosionEndTick)
-	{
-		bVzr = false;
-		timer = 0;
-	}
-	
 	if (ddwin->PreDrawScene())
 	{
 		ddwin->DrawScene();
